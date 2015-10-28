@@ -1,5 +1,6 @@
 package com.adamchilds.jython.util;
 
+import com.adamchilds.jython.JythonScript;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

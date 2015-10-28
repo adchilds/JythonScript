@@ -1,4 +1,4 @@
-package com.adamchilds.jython.util;
+package com.adamchilds.jython;
 
 import com.adamchilds.jython.exception.JythonResultNotFoundException;
 import com.adamchilds.jython.exception.JythonScriptException;
