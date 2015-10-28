@@ -25,7 +25,7 @@ import java.io.InputStream;
  * To use this utility class, you must follow a few strict rules in creating Jython scripts:
  * <ul>
  *     <li>Each script passed to an {@code #evaluate(...)} or {@code #execute(...)} function, such as {@link
- *     JythonScript#evaluate(String)} or {@link JythonScript#execute(String)} MUST be setup as a standard Python main
+ *     JythonScript#evaluate(String, Object...)} or {@link JythonScript#execute(String)} MUST be setup as a standard Python main
  *     module. This means that the following code must exist:
  *     <pre>
  *     {@code if __name__ == '__main__':
@@ -51,7 +51,7 @@ import java.io.InputStream;
  * For more information, follow the respective links to documentation:
  * <ul>
  *     <li>JythonScript - </li>
- *     <li>Python - https://www.python.org/</li>
+ *     <li>Python - https://www.python.org</li>
  *     <li>Jython - http://www.jython.org</li>
  * </ul>
  *
@@ -65,20 +65,11 @@ public class JythonScript {
     private static final String EVALUATION_RESULT_LOCAL_VARIABLE = "result";
 
     /**
+     * Evaluates the Jython script at the given {@code scriptPath}, returning the result as it's equivalent Java type.
      *
-     * @param scriptPath
-     * @return
-     * @throws JythonScriptException
-     */
-    public static Object evaluate(String scriptPath) throws JythonScriptException {
-        return evaluate(scriptPath, new String[0]);
-    }
-
-    /**
-     *
-     * @param scriptPath
-     * @param args
-     * @return
+     * @param scriptPath the fully qualified path of the Jython script to execute
+     * @param args arguments to be passed to the script
+     * @return the result from executing the given script
      * @throws JythonScriptException
      */
     public static Object evaluate(String scriptPath, Object... args) throws JythonScriptException {
@@ -99,10 +90,37 @@ public class JythonScript {
     }
 
     /**
+     * Evaluates the given Jython script, returning the result as it's equivalent Java type.
      *
-     * @param inputStream
-     * @param args
-     * @return
+     * @param scriptFile the Jython script to execute
+     * @param args arguments to be passed to the script
+     * @return the result from executing the given script
+     * @throws JythonScriptException
+     */
+    public static Object evaluate(File scriptFile, Object... args) throws JythonScriptException {
+        // Ensure that the script is not null
+        if (scriptFile == null) {
+            throw new JythonScriptNotFoundException("Could not open Jython script, the file was null.");
+        }
+
+        // Open an InputStream for the file
+        InputStream inputStream;
+        try {
+            inputStream = FileUtil.getFileInputStream(scriptFile);
+        } catch (Exception e) {
+            throw new JythonScriptException("Could not open Jython script from location=[" + scriptFile.getAbsolutePath() + "]", e);
+        }
+
+        // Execute the script
+        return evaluate(inputStream, args);
+    }
+
+    /**
+     * Evaluates the given Jython script, returning the result as it's equivalent Java type.
+     *
+     * @param inputStream the {@link InputStream} that represents the Jython script to be executed
+     * @param args arguments to be passed to the script
+     * @return the result from executing the given script
      * @throws JythonScriptException
      */
     public static Object evaluate(InputStream inputStream, Object... args) throws JythonScriptException {
@@ -120,7 +138,7 @@ public class JythonScript {
     }
 
     /**
-     * Executes the standalone Jython script at the given {@code scriptPath}.
+     * Executes the Jython script at the given {@code scriptPath}.
      *
      * @param scriptPath the fully qualified path of the Jython script to execute
      * @throws JythonScriptException
@@ -130,7 +148,7 @@ public class JythonScript {
     }
 
     /**
-     * Executes the standalone Jython script at the given {@code scriptPath}.
+     * Executes the Jython script at the given {@code scriptPath}.
      *
      * @param scriptPath the fully qualified path of the Jython script to execute
      * @param args arguments to be passed to the script
@@ -155,7 +173,7 @@ public class JythonScript {
     }
 
     /**
-     * Executes the given standalone Jython script.
+     * Executes the given Jython script.
      *
      * @param scriptFile the Jython script to execute
      * @throws JythonScriptException
@@ -165,7 +183,7 @@ public class JythonScript {
     }
 
     /**
-     * Executes the given standalone Jython script.
+     * Executes the given Jython script.
      *
      * @param scriptFile the Jython script to execute
      * @param args arguments to be passed to the script
@@ -190,7 +208,7 @@ public class JythonScript {
     }
 
     /**
-     * Executes the given standalone Jython script.
+     * Executes the given Jython script.
      *
      * @param inputStream the {@link InputStream} that represents the Jython script to be executed
      * @throws JythonScriptException
@@ -200,7 +218,7 @@ public class JythonScript {
     }
 
     /**
-     * Executes the given standalone Jython script.
+     * Executes the given Jython script.
      *
      * @param inputStream the {@link InputStream} that represents the Jython script to be executed
      * @param args arguments to be passed to the script
