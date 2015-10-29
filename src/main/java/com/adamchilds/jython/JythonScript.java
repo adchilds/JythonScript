@@ -39,6 +39,11 @@ import java.io.InputStream;
  *     will not be able to locate this value within the Python interpreter.</li>
  * </ul>
  *
+ * When consuming arguments passed to a Jython script via the 'Object... args' parameter of an execute or evaluate
+ * method, the arguments will be available via Python's sys.argv list. It's important to note that the first argument
+ * (index 0 [sys.argv[0]]) is reserved. Therefore, Jython scripts should always begin accessing these arguments via the
+ * second index of sys.argv (i.e. sys.argv[1]).
+ *
  * Note: JythonScript does not dictate any other strict code structure. You are free to use any of the features provided
  * by Java, Python and Jython, including, but not limited to:
  * <ul>
@@ -50,7 +55,7 @@ import java.io.InputStream;
  *
  * For more information, follow the respective links to documentation:
  * <ul>
- *     <li>JythonScript - </li>
+ *     <li>JythonScript - https://github.com/adchilds/jythonutil</li>
  *     <li>Python - https://www.python.org</li>
  *     <li>Jython - http://www.jython.org</li>
  * </ul>
