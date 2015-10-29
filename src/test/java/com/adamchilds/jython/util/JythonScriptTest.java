@@ -92,7 +92,17 @@ public class JythonScriptTest {
     }
 
     @Test
+    public void testEvaluate_file() {
+
+    }
+
+    @Test
     public void testExecute_file() {
+
+    }
+
+    @Test
+    public void testEvaluate_inputStream() {
 
     }
 
