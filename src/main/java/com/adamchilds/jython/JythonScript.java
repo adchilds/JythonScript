@@ -12,7 +12,7 @@ import java.io.File;
 import java.io.InputStream;
 
 /**
- * {@link JythonScript} provides an easy hook into executing and/or evaluating Python expressions or scripts in the Java
+ * {@link JythonScript} provides an easy hook for executing and/or evaluating Python expressions or scripts in the Java
  * Runtime Environment. JythonScript packages the Jython standalone JAR as part of it's distribution, so no further
  * dependencies should be required.
  *
