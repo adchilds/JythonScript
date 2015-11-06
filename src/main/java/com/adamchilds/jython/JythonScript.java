@@ -169,6 +169,7 @@ public class JythonScript {
 
     /**
      * Evaluates the Jython script at the given {@code scriptPath}, returning the result as it's equivalent Java type.
+     * Accepts optional arguments to be passed to the script at runtime.
      *
      * @param scriptPath the fully qualified path of the Jython script to execute
      * @param args arguments to be passed to the script
@@ -193,7 +194,8 @@ public class JythonScript {
     }
 
     /**
-     * Evaluates the given Jython script, returning the result as it's equivalent Java type.
+     * Evaluates the given Jython script, returning the result as it's equivalent Java type. Accepts optional arguments
+     * to be passed to the script at runtime.
      *
      * @param scriptFile the Jython script to execute
      * @param args arguments to be passed to the script
@@ -219,7 +221,8 @@ public class JythonScript {
     }
 
     /**
-     * Evaluates the given Jython script, returning the result as it's equivalent Java type.
+     * Evaluates the given Jython script, returning the result as it's equivalent Java type. Accepts optional arguments
+     * to be passed to the script at runtime.
      *
      * @param inputStream the {@link InputStream} that represents the Jython script to be executed
      * @param args arguments to be passed to the script
@@ -241,10 +244,12 @@ public class JythonScript {
     }
 
     /**
+     * Evaluates the given Jython script, returning the result as it's equivalent Java type. Accepts optional arguments
+     * to be passed to the script at runtime.
      *
-     * @param pyCode
-     * @param args
-     * @return
+     * @param pyCode the compiled Jython script to evaluate
+     * @param args arguments to be passed to the script
+     * @return the result from executing the given script
      * @throws JythonScriptException
      */
     public static Object evaluate(PyCode pyCode, Object... args) throws JythonScriptException {
@@ -336,9 +341,10 @@ public class JythonScript {
     }
 
     /**
+     * Executes the given Jython script with optional arguments passed to the script at runtime.
      *
-     * @param pyCode
-     * @param args
+     * @param pyCode the compiled Jython script to evaluate
+     * @param args arguments to be passed to the script
      * @throws JythonScriptException
      */
     public static void execute(PyCode pyCode, Object... args) throws JythonScriptException {
