@@ -41,6 +41,10 @@ public class FileUtil {
      * @throws IOException
      */
     public static String readFully(File file) throws IOException {
+        if (file == null) {
+            return "";
+        }
+
         return readFully(new FileInputStream(file), "UTF-8");
     }
 

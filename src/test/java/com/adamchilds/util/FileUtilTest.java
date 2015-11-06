@@ -16,6 +16,9 @@ import static org.junit.Assert.*;
 public class FileUtilTest {
 
     private static final String JYTHON_SCRIPT_BASE_PATH = "script/jython/";
+    private static final String TEST_RESOURCE_BASE_PATH = "test/";
+
+    private static final String CONTENTS_OF_FILE_WITH_CONTENT = "This is a test text file with\n\n\nmultiple\n\nlines.";
 
     @Test
     public void testGetFileInputStream_string() {
@@ -86,6 +89,42 @@ public class FileUtilTest {
         } catch (IOException e) {
             // This is NOT expected
             fail("Unexpected IOException while converting String to FileInputStream.");
+        }
+    }
+
+    @Test
+    public void testReadFully_file() {
+        // Null
+        try {
+            assertEquals("", FileUtil.readFully(null));
+        } catch (IOException e) {
+            fail("Unexpected error occurred.");
+        }
+
+        // Empty
+        File file = new File(ClassLoader.getSystemResource(TEST_RESOURCE_BASE_PATH + "test_empty.txt").getPath());
+        try {
+            assertEquals("", FileUtil.readFully(file));
+        } catch (IOException e) {
+            fail("Unexpected error occurred.");
+        }
+
+        // Invalid
+        try {
+            FileUtil.readFully(new File("/Users/test.py"));
+        } catch (IOException e) {
+            // This is expected
+        }
+
+        // Valid
+        file = new File(ClassLoader.getSystemResource(TEST_RESOURCE_BASE_PATH + "test_content.txt").getPath());
+        try {
+            String fileContents = FileUtil.readFully(file);
+
+            assertNotNull(fileContents);
+            assertEquals(CONTENTS_OF_FILE_WITH_CONTENT, fileContents);
+        } catch (IOException e) {
+            fail("Unexpected error occurred.");
         }
     }
 
