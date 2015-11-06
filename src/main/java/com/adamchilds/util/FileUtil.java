@@ -1,8 +1,6 @@
 package com.adamchilds.util;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.*;
 
 /**
  * Provides static file operations, such as converting a {@link String} or {@link File} to an {@link InputStream}.
@@ -25,14 +23,56 @@ public class FileUtil {
      * @param object the object to convert to an input stream
      * @return a new {@link InputStream} created from the given {@code object}
      */
-    public static InputStream getFileInputStream(Object object) throws Exception {
+    public static InputStream getFileInputStream(Object object) throws IOException {
         if (object instanceof String) {
             return new FileInputStream((String) object);
         } else if (object instanceof File) {
             return new FileInputStream((File) object);
         }
 
-        throw new Exception("Could not convert the given object to an InputStream. object=[" + object.toString() + "]");
+        throw new IOException("Could not convert the given object to an InputStream. object=[" + object + "]");
+    }
+
+    /**
+     * Reads the entire contents of the given {@link File} to a {@link String}. Defaults to the UTF-8 character encoding.
+     *
+     * @param file the {@link File} to read the contents of
+     * @return a new {@link String} that contains the contents of the given file
+     * @throws IOException
+     */
+    public static String readFully(File file) throws IOException {
+        return readFully(new FileInputStream(file), "UTF-8");
+    }
+
+    /**
+     * Reads the entire contents of the given {@link InputStream} to a {@link String}.
+     *
+     * @param inputStream the {@link InputStream} to read the contents of
+     * @param encoding the character encoding that the resulting {@link String} should be (i.e. UTF-8)
+     * @return a new {@link String} that contains the contents of the given stream
+     * @throws IOException
+     */
+    public static String readFully(InputStream inputStream, String encoding) throws IOException {
+        return new String(readFully(inputStream), encoding);
+    }
+
+    /**
+     * Reads the entire contents of the given {@link InputStream} to a new byte array.
+     *
+     * @param inputStream the {@link InputStream} to read the contents of
+     * @return a new array of bytes that contains the contents of the given stream
+     * @throws IOException
+     */
+    private static byte[] readFully(InputStream inputStream) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int length;
+
+        while ((length = inputStream.read(buffer)) != -1) {
+            baos.write(buffer, 0, length);
+        }
+
+        return baos.toByteArray();
     }
 
 }

@@ -1,5 +1,6 @@
 from java.lang import System
 
+
 def test():
     """
     Prints out a simple message for testin purposes.

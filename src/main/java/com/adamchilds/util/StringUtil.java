@@ -15,7 +15,7 @@ public class StringUtil {
      * @return true if the String is null or empty; false otherwise
      */
     public static boolean isBlank(String value) {
-        return value == null || value.length() == 0;
+        return value == null || value.length() == 0 || value.trim().length() == 0;
     }
 
     /**
@@ -25,7 +25,7 @@ public class StringUtil {
      * @return true if the String is not null or empty; false otherwise
      */
     public static boolean isNotBlank(String value) {
-        return value != null && value.length() > 0;
+        return value != null && value.trim().length() > 0;
     }
 
 }

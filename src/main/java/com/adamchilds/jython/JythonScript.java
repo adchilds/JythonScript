@@ -9,7 +9,10 @@ import org.python.core.*;
 import org.python.util.PythonInterpreter;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * {@link JythonScript} provides an easy hook for executing and/or evaluating Python expressions or scripts in the Java
@@ -25,8 +28,8 @@ import java.io.InputStream;
  * To use this utility class, you must follow a few strict rules in creating Jython scripts:
  * <ul>
  *     <li>Each script passed to an {@code #evaluate(...)} or {@code #execute(...)} function, such as {@link
- *     JythonScript#evaluate(String, Object...)} or {@link JythonScript#execute(String)} MUST be setup as a standard Python main
- *     module. This means that the following code must exist:
+ *     JythonScript#evaluate(String, Object...)} or {@link JythonScript#execute(String, Object...)} MUST be setup as a
+ *     standard Python main module. This means that the following code must exist:
  *     <pre>
  *     {@code if __name__ == '__main__':
  *          ...
@@ -43,6 +46,15 @@ import java.io.InputStream;
  * method, the arguments will be available via Python's sys.argv list. It's important to note that the first argument
  * (index 0 [sys.argv[0]]) is reserved. Therefore, Jython scripts should always begin accessing these arguments via the
  * second index of sys.argv (i.e. sys.argv[1]).
+ *
+ * <br />
+ * <br />
+ *
+ * JythonScript provides {@code #compile(...)} functions that compile the given scripts into {@link PyCode} objects. For
+ * speed increases at runtime, it's better to pre-compile Jython scripts with these functions, maintain the PyCode
+ * objects via an in-memory cache or local variable, and execute or evaluate the scripts with the compiled scripts.
+ * JythonScript provides the necessary {@link #evaluate(PyCode, Object...)} and {@link #execute(PyCode, Object...)}
+ * methods to foster these speed increases.
  *
  * <br />
  * <br />
@@ -68,9 +80,92 @@ import java.io.InputStream;
  */
 public class JythonScript {
 
-    public static PythonInterpreter INTERPRETER = new PythonInterpreter();
+    private static PythonInterpreter INTERPRETER = new PythonInterpreter();
 
     private static final String EVALUATION_RESULT_LOCAL_VARIABLE = "result";
+
+    /**
+     * Compiles the Jython script at the given {@code filePath} into a {@link PyCode} object.
+     *
+     * @param filePath the absolute path of the Jython file to compile
+     * @return a compiled Jython script
+     * @throws JythonScriptException
+     */
+    public static PyCode compile(String filePath) throws JythonScriptException {
+        // Make sure the file path is is not null or empty
+        if (StringUtil.isBlank(filePath)) {
+            throw new JythonScriptException("Given path is not a file. path=[" + filePath + "]");
+        }
+
+        // Compile the script
+        return compile(new File(filePath));
+    }
+
+    /**
+     * Compiles multiple Jython scripts at the given file paths into {@link PyCode} objects. This function builds out a
+     * {@link Map} where the key is the absolute filepath and the value is the compiled Jython script.
+     *
+     * @param files the absolute paths of the Jython files to compile
+     * @return a {@link Map} of {@link String} (filepath) to {@link PyCode} (compiled scripts)
+     */
+    public static Map<String, PyCode> compile(String... files) throws JythonScriptException {
+        Map<String, PyCode> compiledScripts = new HashMap<>();
+
+        // Compile each script
+        for (String filePath : files) {
+            PyCode compiledScript = compile(filePath);
+
+            compiledScripts.put(filePath, compiledScript);
+        }
+
+        return compiledScripts;
+    }
+
+    /**
+     * Compiles the given Jython script into a {@link PyCode} object.
+     *
+     * @param file the Jython file to compile
+     * @return a compiled Jython script
+     * @throws JythonScriptException
+     */
+    public static PyCode compile(File file) throws JythonScriptException {
+        if (file == null) {
+            throw new JythonScriptException("Given file is null; cannot be compiled into PyCode.");
+        }
+
+        // Make sure the file is actually a valid file
+        if (!file.isFile()) {
+            throw new JythonScriptException("Given file object is not a file. Is it a directory? file=[" +
+                    file.getAbsolutePath() + "]");
+        }
+
+        // Compile the file, returning the associated PyCode object
+        try {
+            return INTERPRETER.compile(FileUtil.readFully(file));
+        } catch (IOException e) {
+            throw new JythonScriptException("Could not compile the given file. file=[" +
+                    file.getAbsolutePath() + "]", e);
+        }
+    }
+
+    /**
+     * Compiles multiple Jython scripts from the given files into {@link PyCode} objects. This function builds out a
+     * {@link Map} where the key is the absolute filepath and the value is the compiled Jython script.
+     *
+     * @param files the Jython files to compile
+     * @return a {@link Map} of {@link String} (filepath) to {@link PyCode} (compiled scripts)
+     */
+    public static Map<String, PyCode> compile(File... files) throws JythonScriptException {
+        Map<String, PyCode> compiledScripts = new HashMap<>();
+
+        for (File file : files) {
+            PyCode compiledScript = compile(file);
+
+            compiledScripts.put(file.getAbsolutePath(), compiledScript);
+        }
+
+        return compiledScripts;
+    }
 
     /**
      * Evaluates the Jython script at the given {@code scriptPath}, returning the result as it's equivalent Java type.
@@ -146,17 +241,29 @@ public class JythonScript {
     }
 
     /**
-     * Executes the Jython script at the given {@code scriptPath}.
      *
-     * @param scriptPath the fully qualified path of the Jython script to execute
+     * @param pyCode
+     * @param args
+     * @return
      * @throws JythonScriptException
      */
-    public static void execute(String scriptPath) throws JythonScriptException {
-        execute(scriptPath, new String[0]);
+    public static Object evaluate(PyCode pyCode, Object... args) throws JythonScriptException {
+        // Execute the script
+        execute(pyCode, args);
+
+        // Obtain the value of a local variable named 'result' from the executed script
+        PyObject result = INTERPRETER.get(EVALUATION_RESULT_LOCAL_VARIABLE);
+
+        if (result == null) {
+            throw new JythonResultNotFoundException("Local variable 'result' not found during script execution.");
+        }
+
+        return parseResult(result);
     }
 
     /**
-     * Executes the Jython script at the given {@code scriptPath}.
+     * Executes the Jython script at the given {@code scriptPath} with optional arguments passed to the script at
+     * runtime.
      *
      * @param scriptPath the fully qualified path of the Jython script to execute
      * @param args arguments to be passed to the script
@@ -181,17 +288,7 @@ public class JythonScript {
     }
 
     /**
-     * Executes the given Jython script.
-     *
-     * @param scriptFile the Jython script to execute
-     * @throws JythonScriptException
-     */
-    public static void execute(File scriptFile) throws JythonScriptException {
-        execute(scriptFile, new String[0]);
-    }
-
-    /**
-     * Executes the given Jython script.
+     * Executes the given Jython script with optional arguments passed to the script at runtime.
      *
      * @param scriptFile the Jython script to execute
      * @param args arguments to be passed to the script
@@ -216,39 +313,63 @@ public class JythonScript {
     }
 
     /**
-     * Executes the given Jython script.
-     *
-     * @param inputStream the {@link InputStream} that represents the Jython script to be executed
-     * @throws JythonScriptException
-     */
-    public static void execute(InputStream inputStream) throws JythonScriptException {
-        execute(inputStream, new String[0]);
-    }
-
-    /**
-     * Executes the given Jython script.
+     * Executes the given Jython script with optional arguments passed to the script at runtime.
      *
      * @param inputStream the {@link InputStream} that represents the Jython script to be executed
      * @param args arguments to be passed to the script
      * @throws JythonScriptException
      */
     public static void execute(InputStream inputStream, Object... args) throws JythonScriptException {
-        if (inputStream != null) {
-            // Setup the Python System State by appending the given arguments
-            PySystemState state = parseArguments(args);
-
-            // Add the arguments to the PythonInterpreter
-            INTERPRETER = new PythonInterpreter(null, state);
-
-            try {
-                // Execute the script
-                INTERPRETER.execfile(inputStream);
-            } catch (Exception e) {
-                throw new JythonScriptException("An error occurred during script execution. cause=[\n\t" + e.toString() + "]");
-            }
-        } else {
+        if (inputStream == null) {
             throw new JythonScriptException("Cannot execute a Jython script that doesn't exist! InputStream is null.");
         }
+
+        // Set the arguments on the Python System State
+        updateInterpreterState(args);
+
+        try {
+            // Execute the script
+            INTERPRETER.execfile(inputStream);
+        } catch (Exception e) {
+            throw new JythonScriptException("An error occurred during script execution. cause=[\n\t" + e.toString() + "]");
+        }
+    }
+
+    /**
+     *
+     * @param pyCode
+     * @param args
+     * @throws JythonScriptException
+     */
+    public static void execute(PyCode pyCode, Object... args) throws JythonScriptException {
+        if (pyCode == null) {
+            throw new JythonScriptException("Cannot execute a Jython script that doesn't exist! InputStream is null.");
+        }
+
+        // Set the arguments on the Python System State
+        updateInterpreterState(args);
+
+        try {
+            // Execute the script
+            INTERPRETER.exec(pyCode);
+        } catch (Exception e) {
+            throw new JythonScriptException("An error occurred during script execution. cause=[\n\t" + e.toString() + "]");
+        }
+    }
+
+    /**
+     * Updates the {@link PythonInterpreter}s {@link PySystemState} by adding the given {@code args}. These arguments
+     * may be accessed from within Jython scripts via the 'sys.argv' parameters, beginning at the second index (i.e.
+     * sys.argv[1]). Note: the first index is reserved.
+     *
+     * @param args the arguments to set on the {@link PySystemState} for the current {@link PythonInterpreter}
+     */
+    private static void updateInterpreterState(Object... args) {
+        // Setup the Python System State by appending the given arguments
+        PySystemState state = parseArguments(args);
+
+        // Add the arguments to the PythonInterpreter
+        INTERPRETER = new PythonInterpreter(null, state);
     }
 
     /**
@@ -306,5 +427,7 @@ public class JythonScript {
 
         return null;
     }
+
+    private JythonScript() { }
 
 }
