@@ -386,12 +386,9 @@ public class JythonScript {
      */
     private static PySystemState parseArguments(Object... args) {
         PySystemState systemState = new PySystemState();
+
         for (Object arg : args) {
-            if (arg instanceof String) {
-                systemState.argv.append(new PyString((String) arg));
-            } else {
-                systemState.argv.append(Py.java2py(arg));
-            }
+            systemState.argv.append(Py.java2py(arg));
         }
 
         return systemState;

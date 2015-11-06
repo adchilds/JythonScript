@@ -1,8 +1,8 @@
 # JythonScript v0.1
 
 ## Description:
-JythonScript provides an easy hook into executing and/or evaluating Python expressions or scripts in the Java Runtime 
-Environment.
+JythonScript provides an easy to use wrapper for executing and/or evaluating Python expressions and scripts in the Java 
+Runtime Environment.
 
 ## Dependencies:
 None. JythonScript packages the Jython standalone JAR as part of it's distribution, so no further dependencies are
