@@ -445,4 +445,31 @@ public class JythonScriptTest {
         }
     }
 
+    @Test
+    public void testExecute_oop() {
+        String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testOOP.py").getPath();
+        try {
+            PyCode compiledScript = JythonScript.compile(filePath);
+
+            JythonScript.execute(compiledScript, 10, 10);
+        } catch (JythonScriptException e) {
+            fail("Unexpected error occurred.");
+        }
+    }
+
+    @Test
+    public void testEvaluate_oop() {
+        String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testOOP.py").getPath();
+        try {
+            PyCode compiledScript = JythonScript.compile(filePath);
+
+            Object result = JythonScript.evaluate(compiledScript, 10, 10);
+
+            assertNotNull(result);
+            assertEquals(51, result);
+        } catch (JythonScriptException e) {
+            fail("Unexpected error occurred.");
+        }
+    }
+
 }
