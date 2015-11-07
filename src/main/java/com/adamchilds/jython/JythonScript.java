@@ -52,9 +52,9 @@ import java.util.Map;
  *
  * JythonScript provides {@code #compile(...)} functions that compile the given scripts into {@link PyCode} objects. For
  * speed increases at runtime, it's better to pre-compile Jython scripts with these functions, maintain the PyCode
- * objects via an in-memory cache or local variable, and execute or evaluate the scripts with the compiled scripts.
- * JythonScript provides the necessary {@link #evaluate(PyCode, Object...)} and {@link #execute(PyCode, Object...)}
- * methods to foster these speed increases.
+ * objects via an in-memory cache or local variable, and execute or evaluate with the compiled scripts. JythonScript
+ * provides the necessary {@link #evaluate(PyCode, Object...)} and {@link #execute(PyCode, Object...)} methods to
+ * foster these speed increases.
  *
  * <br />
  * <br />
