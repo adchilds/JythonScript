@@ -17,7 +17,8 @@ public class FileUtilTest {
 
     private static final String JYTHON_SCRIPT_BASE_PATH = "script/jython/";
     private static final String TEST_RESOURCE_BASE_PATH = "test/";
-    private static final String CONTENTS_OF_FILE_WITH_CONTENT = "This is a test text file with\r\n\r\n\r\nmultiple\r\n\r\nlines.";
+    private static final String CONTENTS_OF_FILE_WITH_CONTENT_WIN = "This is a test text file with\r\n\r\n\r\nmultiple\r\n\r\nlines.";
+    private static final String CONTENTS_OF_FILE_WITH_CONTENT_UNIX = "This is a test text file with\n\n\nmultiple\n\nlines.";
 
     @Test
     public void testGetFileInputStream_string() {
@@ -121,7 +122,8 @@ public class FileUtilTest {
             String fileContents = FileUtil.readFully(file);
 
             assertNotNull(fileContents);
-            assertEquals(CONTENTS_OF_FILE_WITH_CONTENT, fileContents);
+            assertTrue(CONTENTS_OF_FILE_WITH_CONTENT_WIN.equals(fileContents) ||
+                    CONTENTS_OF_FILE_WITH_CONTENT_UNIX.equals(fileContents));
         } catch (IOException e) {
             fail("Unexpected error occurred.");
         }
