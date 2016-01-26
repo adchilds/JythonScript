@@ -56,43 +56,6 @@ public class JythonScriptTest {
     }
 
     @Test
-    public void testCompile_filePaths() {
-        // Null
-        try {
-            JythonScript.compile((String) null, (String) null);
-        } catch (JythonScriptException e) {
-            // This is expected
-        }
-
-        // Empty
-        try {
-            JythonScript.compile("", "");
-        } catch (JythonScriptException e) {
-            // This is expected
-        }
-
-        // Invalid
-        try {
-            JythonScript.compile("/Users/test/notfound.py", "/Users/test/test.py");
-        } catch (JythonScriptException e) {
-            // This is expected
-        }
-
-        // Valid
-        String filePath1 = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testEvaluate.py").getPath();
-        String filePath2 = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testExecute.py").getPath();
-
-        try {
-            Map<String, PyCode> compiledScripts = JythonScript.compile(filePath1, filePath2);
-            assertNotNull(compiledScripts);
-            assertTrue(compiledScripts.containsKey(filePath1));
-            assertTrue(compiledScripts.containsKey(filePath2));
-        } catch (JythonScriptException e) {
-            fail("Compiling scripts failed. error=[" + e + "]");
-        }
-    }
-
-    @Test
     public void testCompile_file() {
         // Null
         try {
@@ -121,43 +84,6 @@ public class JythonScriptTest {
         try {
             PyCode compiledScript = JythonScript.compile(file);
             assertNotNull(compiledScript);
-        } catch (JythonScriptException e) {
-            fail("Compiling scripts failed. error=[" + e + "]");
-        }
-    }
-
-    @Test
-    public void testCompile_files() {
-        // Null
-        try {
-            JythonScript.compile((File) null, (File) null);
-        } catch (JythonScriptException e) {
-            // This is expected
-        }
-
-        // Empty
-        try {
-            JythonScript.compile(new File("/"), new File("/"));
-        } catch (JythonScriptException e) {
-            // This is expected
-        }
-
-        // Invalid
-        try {
-            JythonScript.compile(new File("/Users/test/notfound.py"), new File("/Users/test/test.py"));
-        } catch (JythonScriptException e) {
-            // This is expected
-        }
-
-        // Valid
-        File file1 = new File(ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testEvaluate.py").getPath());
-        File file2 = new File(ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testExecute.py").getPath());
-
-        try {
-            Map<String, PyCode> compiledScripts = JythonScript.compile(file1, file2);
-            assertNotNull(compiledScripts);
-            assertTrue(compiledScripts.containsKey(file1.getAbsolutePath()));
-            assertTrue(compiledScripts.containsKey(file2.getAbsolutePath()));
         } catch (JythonScriptException e) {
             fail("Compiling scripts failed. error=[" + e + "]");
         }

@@ -102,26 +102,6 @@ public class JythonScript {
     }
 
     /**
-     * Compiles multiple Jython scripts at the given file paths into {@link PyCode} objects. This function builds out a
-     * {@link Map} where the key is the absolute filepath and the value is the compiled Jython script.
-     *
-     * @param files the absolute paths of the Jython files to compile
-     * @return a {@link Map} of {@link String} (filepath) to {@link PyCode} (compiled scripts)
-     */
-    public static Map<String, PyCode> compile(String... files) throws JythonScriptException {
-        Map<String, PyCode> compiledScripts = new HashMap<>();
-
-        // Compile each script
-        for (String filePath : files) {
-            PyCode compiledScript = compile(filePath);
-
-            compiledScripts.put(filePath, compiledScript);
-        }
-
-        return compiledScripts;
-    }
-
-    /**
      * Compiles the given Jython script into a {@link PyCode} object.
      *
      * @param file the Jython file to compile
@@ -146,25 +126,6 @@ public class JythonScript {
             throw new JythonScriptException("Could not compile the given file. file=[" +
                     file.getAbsolutePath() + "]", e);
         }
-    }
-
-    /**
-     * Compiles multiple Jython scripts from the given files into {@link PyCode} objects. This function builds out a
-     * {@link Map} where the key is the absolute filepath and the value is the compiled Jython script.
-     *
-     * @param files the Jython files to compile
-     * @return a {@link Map} of {@link String} (filepath) to {@link PyCode} (compiled scripts)
-     */
-    public static Map<String, PyCode> compile(File... files) throws JythonScriptException {
-        Map<String, PyCode> compiledScripts = new HashMap<>();
-
-        for (File file : files) {
-            PyCode compiledScript = compile(file);
-
-            compiledScripts.put(file.getAbsolutePath(), compiledScript);
-        }
-
-        return compiledScripts;
     }
 
     /**
