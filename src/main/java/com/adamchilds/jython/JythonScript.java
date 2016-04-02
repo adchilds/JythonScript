@@ -11,8 +11,6 @@ import org.python.util.PythonInterpreter;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * {@link JythonScript} provides an easy hook for executing and/or evaluating Python expressions or scripts in the Java

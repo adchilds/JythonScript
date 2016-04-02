@@ -7,7 +7,6 @@ import org.python.core.PyCode;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.Map;
 
 import static org.junit.Assert.*;
 
