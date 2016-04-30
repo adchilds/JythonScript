@@ -1,5 +1,7 @@
 # JythonScript v0.1
 
+[![Build Status](https://travis-ci.org/adchilds/JythonScript.svg?branch=develop)](https://travis-ci.org/adchilds/JythonScript) [![Coverage Status](https://coveralls.io/repos/github/adchilds/JythonScript/badge.svg?branch=develop)](https://coveralls.io/github/adchilds/JythonScript?branch=develop)
+
 ## Description:
 JythonScript provides an easy to use wrapper for executing and/or evaluating Python expressions and scripts in the Java 
 Runtime Environment.
@@ -12,10 +14,10 @@ required.
 
   test.py:
 	
-	import sys
+	from java.lang import System
 	
 	def test():
-		print 'Hello from Jython'
+		System.out.println('Hello from Jython')
 	
 	if __name__ == '__main__':
 		test()
