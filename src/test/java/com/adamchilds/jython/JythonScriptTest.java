@@ -395,4 +395,144 @@ public class JythonScriptTest {
         }
     }
 
+    @Test
+    public void testEvaluate_returnBoolean() {
+        String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testReturnBoolean.py").getPath();
+        try {
+            PyCode compiledScript = JythonScript.compile(filePath);
+
+            Object result = JythonScript.evaluate(compiledScript);
+            assertNotNull(result);
+            assertTrue(result instanceof Boolean);
+            assertEquals(false, result);
+
+            result = JythonScript.evaluate(compiledScript, false, false);
+            assertNotNull(result);
+            assertTrue(result instanceof Boolean);
+            assertEquals(false, result);
+
+            result = JythonScript.evaluate(compiledScript, true, false);
+            assertNotNull(result);
+            assertTrue(result instanceof Boolean);
+            assertEquals(true, result);
+
+            result = JythonScript.evaluate(compiledScript, false, true);
+            assertNotNull(result);
+            assertTrue(result instanceof Boolean);
+            assertEquals(true, result);
+
+            result = JythonScript.evaluate(compiledScript, true, true);
+            assertNotNull(result);
+            assertTrue(result instanceof Boolean);
+            assertEquals(true, result);
+        } catch (JythonScriptException e) {
+            fail("Unexpected error occurred.");
+        }
+    }
+
+    @Test
+    public void testEvaluate_returnInteger() {
+        String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testEvaluate.py").getPath();
+        try {
+            PyCode compiledScript = JythonScript.compile(filePath);
+
+            Object result = JythonScript.evaluate(compiledScript);
+            assertNotNull(result);
+            assertTrue(result instanceof Integer);
+            assertEquals(25, result);
+
+            result = JythonScript.evaluate(compiledScript, 10, 10);
+            assertNotNull(result);
+            assertTrue(result instanceof Integer);
+            assertEquals(100, result);
+
+            result = JythonScript.evaluate(compiledScript, 0, 0);
+            assertNotNull(result);
+            assertTrue(result instanceof Integer);
+            assertEquals(0, result);
+
+            result = JythonScript.evaluate(compiledScript, -1, 20);
+            assertNotNull(result);
+            assertTrue(result instanceof Integer);
+            assertEquals(-20, result);
+        } catch (JythonScriptException e) {
+            fail("Unexpected error occurred.");
+        }
+    }
+
+    @Test
+    public void testEvaluate_returnString() {
+        String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testReturnString.py").getPath();
+        try {
+            PyCode compiledScript = JythonScript.compile(filePath);
+
+            Object result = JythonScript.evaluate(compiledScript);
+            assertNotNull(result);
+            assertTrue(result instanceof String);
+            assertEquals("", result);
+
+            result = JythonScript.evaluate(compiledScript, "jython", "test");
+            assertNotNull(result);
+            assertTrue(result instanceof String);
+            assertEquals("jython", result);
+
+            result = JythonScript.evaluate(compiledScript, "test", "jython");
+            assertNotNull(result);
+            assertTrue(result instanceof String);
+            assertEquals("jython", result);
+
+            result = JythonScript.evaluate(compiledScript, "test");
+            assertNotNull(result);
+            assertTrue(result instanceof String);
+            assertEquals("test", result);
+        } catch (JythonScriptException e) {
+            fail("Unexpected error occurred.");
+        }
+    }
+
+    @Test
+    public void testEvaluate_returnFloat() {
+        String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testReturnFloat.py").getPath();
+        try {
+            PyCode compiledScript = JythonScript.compile(filePath);
+
+            Object result = JythonScript.evaluate(compiledScript);
+            assertNotNull(result);
+            assertTrue(result instanceof Float);
+            assertEquals(8.778f, result);
+
+            result = JythonScript.evaluate(compiledScript, 10.5, 10.1);
+            assertNotNull(result);
+            assertTrue(result instanceof Float);
+            assertEquals(20.6f, result);
+
+            result = JythonScript.evaluate(compiledScript, 0.0, 0);
+            assertNotNull(result);
+            assertTrue(result instanceof Float);
+            assertEquals(0f, result);
+
+            result = JythonScript.evaluate(compiledScript, -1.5, 20.736587);
+            assertNotNull(result);
+            assertTrue(result instanceof Float);
+            assertEquals(19.236588f, result);
+        } catch (JythonScriptException e) {
+            fail("Unexpected error occurred.");
+        }
+    }
+
+    @Test
+    public void testEvaluate_returnLong() {
+        String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testEvaluate.py").getPath();
+        try {
+            PyCode compiledScript = JythonScript.compile(filePath);
+
+            Object result = JythonScript.evaluate(compiledScript, 75987958723958L, 3);
+            assertNotNull(result);
+            assertTrue(result instanceof Long);
+            assertEquals(227963876171874L, result);
+        } catch (JythonScriptException e) {
+            fail("Unexpected error occurred.");
+        }
+    }
+
 }
