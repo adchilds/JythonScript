@@ -79,4 +79,7 @@ public class FileUtil {
         return baos.toByteArray();
     }
 
+    // Don't allow this class to be instantiated
+    private FileUtil() { }
+
 }

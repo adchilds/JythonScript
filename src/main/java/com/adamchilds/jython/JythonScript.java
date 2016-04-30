@@ -390,6 +390,7 @@ public class JythonScript {
         return null;
     }
 
+    // Don't allow this class to be instantiated
     private JythonScript() { }
 
 }

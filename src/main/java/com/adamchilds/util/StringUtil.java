@@ -28,4 +28,7 @@ public class StringUtil {
         return value != null && value.trim().length() > 0;
     }
 
+    // Don't allow this class to be instantiated
+    private StringUtil() { }
+
 }
