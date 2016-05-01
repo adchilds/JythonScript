@@ -18,7 +18,7 @@ import static org.junit.Assert.*;
  */
 public class JythonScriptTest {
 
-    private static final String JYTHON_SCRIPT_BASE_PATH = "script/jython/";
+    public static final String JYTHON_SCRIPT_BASE_PATH = "script/jython/";
 
     @Test
     public void testCompile_filePath() {
@@ -86,6 +86,13 @@ public class JythonScriptTest {
         } catch (JythonScriptException e) {
             fail("Compiling scripts failed. error=[" + e + "]");
         }
+    }
+
+    @Test(expected = JythonScriptException.class)
+    public void testCompile_directory() throws JythonScriptException {
+        File file = new File(ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH).getPath());
+
+        JythonScript.compile(file);
     }
 
     @Test

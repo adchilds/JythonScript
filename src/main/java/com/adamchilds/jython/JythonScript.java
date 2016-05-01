@@ -146,7 +146,7 @@ public class JythonScript {
         try {
             inputStream = FileUtil.getFileInputStream(scriptPath);
         } catch (Exception e) {
-            throw new JythonScriptException("Could not open Jython script from location=[" + scriptPath + "]", e);
+            throw new JythonScriptNotFoundException("Could not open Jython script from location=[" + scriptPath + "]", e);
         }
 
         return evaluate(inputStream, args);
@@ -172,7 +172,7 @@ public class JythonScript {
         try {
             inputStream = FileUtil.getFileInputStream(scriptFile);
         } catch (Exception e) {
-            throw new JythonScriptException("Could not open Jython script from location=[" + scriptFile.getAbsolutePath() + "]", e);
+            throw new JythonScriptNotFoundException("Could not open Jython script from location=[" + scriptFile.getAbsolutePath() + "]", e);
         }
 
         // Execute the script
@@ -244,7 +244,7 @@ public class JythonScript {
         try {
             inputStream = FileUtil.getFileInputStream(scriptPath);
         } catch (Exception e) {
-            throw new JythonScriptException("Could not open Jython script from location=[" + scriptPath + "]", e);
+            throw new JythonScriptNotFoundException("Could not open Jython script from location=[" + scriptPath + "]", e);
         }
 
         // Execute the script
@@ -269,7 +269,7 @@ public class JythonScript {
         try {
             inputStream = FileUtil.getFileInputStream(scriptFile);
         } catch (Exception e) {
-            throw new JythonScriptException("Could not open Jython script from location=[" + scriptFile.getAbsolutePath() + "]", e);
+            throw new JythonScriptNotFoundException("Could not open Jython script from location=[" + scriptFile.getAbsolutePath() + "]", e);
         }
 
         // Execute the script
