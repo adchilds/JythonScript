@@ -2,6 +2,10 @@ package com.adamchilds.util;
 
 import org.junit.Test;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
+
 import static org.junit.Assert.*;
 
 /**
@@ -44,6 +48,14 @@ public class StringUtilTest {
         assertTrue(StringUtil.isNotBlank("Test"));
         assertTrue(StringUtil.isNotBlank("1234"));
         assertTrue(StringUtil.isNotBlank("!@#$"));
+    }
+
+    @Test
+    public void testConstructorIsPrivate() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        Constructor<StringUtil> constructor = StringUtil.class.getDeclaredConstructor();
+        assertTrue(Modifier.isPrivate(constructor.getModifiers()));
+        constructor.setAccessible(true);
+        constructor.newInstance();
     }
 
 }

@@ -20,6 +20,13 @@ public class JythonResultNotFoundExceptionTest {
     }
 
     @Test(expected = JythonResultNotFoundException.class)
+    public void testJythonResultNotFoundException_resultNotFoundMultiArgs() throws JythonScriptException {
+        String filePath = ClassLoader.getSystemResource(JythonScriptTest.JYTHON_SCRIPT_BASE_PATH + "testResultNotFound.py").getPath();
+
+        JythonScript.evaluate(filePath, 0, 1, 2, 3, 4, 5);
+    }
+
+    @Test(expected = JythonResultNotFoundException.class)
     public void testJythonResultNotFoundException() throws JythonScriptException {
         throw new JythonResultNotFoundException();
     }

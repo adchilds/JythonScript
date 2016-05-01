@@ -7,6 +7,9 @@ import org.python.core.PyCode;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 
 import static org.junit.Assert.*;
 
@@ -540,6 +543,14 @@ public class JythonScriptTest {
         } catch (JythonScriptException e) {
             fail("Unexpected error occurred.");
         }
+    }
+
+    @Test
+    public void testConstructorIsPrivate() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        Constructor<JythonScript> constructor = JythonScript.class.getDeclaredConstructor();
+        assertTrue(Modifier.isPrivate(constructor.getModifiers()));
+        constructor.setAccessible(true);
+        constructor.newInstance();
     }
 
 }
