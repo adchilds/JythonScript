@@ -1,4 +1,4 @@
-package com.adamchilds.jython.exception;
+package com.github.adchilds.jython.exception;
 
 /**
  * Generic Jython script execution/evaluation exception thrown in potentially unknown circumstances during Jython script

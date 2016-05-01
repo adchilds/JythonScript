@@ -1,10 +1,10 @@
-package com.adamchilds.jython;
+package com.github.adchilds.jython;
 
-import com.adamchilds.jython.exception.JythonResultNotFoundException;
-import com.adamchilds.jython.exception.JythonScriptException;
-import com.adamchilds.jython.exception.JythonScriptNotFoundException;
-import com.adamchilds.util.FileUtil;
-import com.adamchilds.util.StringUtil;
+import com.github.adchilds.jython.exception.JythonResultNotFoundException;
+import com.github.adchilds.jython.exception.JythonScriptException;
+import com.github.adchilds.jython.exception.JythonScriptNotFoundException;
+import com.github.adchilds.util.FileUtil;
+import com.github.adchilds.util.StringUtil;
 import org.python.core.*;
 import org.python.util.PythonInterpreter;
 

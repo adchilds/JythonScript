@@ -1,6 +1,7 @@
-package com.adamchilds.jython;
+package com.github.adchilds.jython;
 
-import com.adamchilds.jython.exception.JythonScriptException;
+import com.github.adchilds.jython.exception.JythonScriptException;
+import com.github.adchilds.jython.JythonScript;
 import org.junit.Test;
 import org.python.core.PyCode;
 

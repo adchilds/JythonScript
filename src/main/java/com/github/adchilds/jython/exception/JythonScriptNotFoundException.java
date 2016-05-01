@@ -1,4 +1,4 @@
-package com.adamchilds.jython.exception;
+package com.github.adchilds.jython.exception;
 
 import java.io.File;
 import java.io.InputStream;

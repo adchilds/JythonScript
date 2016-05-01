@@ -24,7 +24,7 @@ required.
 
   Test.java:
 
-	import com.adamchilds.jython.JythonScript;
+	import com.github.adchilds.jython.JythonScript;
 	
 	public class Test {
 	
@@ -53,7 +53,7 @@ required.
 
   Test2.java
 
-	import com.adamchilds.jython.JythonScript;
+	import com.github.adchilds.jython.JythonScript;
 	
 	public class Test2 {
 	

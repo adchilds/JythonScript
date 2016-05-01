@@ -1,4 +1,4 @@
-package com.adamchilds.util;
+package com.github.adchilds.util;
 
 import java.io.*;
 
