@@ -1,8 +1,6 @@
 package com.github.adchilds.jython.exception;
 
 import com.github.adchilds.jython.JythonScript;
-import com.github.adchilds.jython.exception.JythonScriptException;
-import com.github.adchilds.jython.exception.JythonScriptNotFoundException;
 import org.junit.Test;
 
 /**

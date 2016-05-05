@@ -1,7 +1,6 @@
 package com.github.adchilds.jython;
 
 import com.github.adchilds.jython.exception.JythonScriptException;
-import com.github.adchilds.jython.JythonScript;
 import org.junit.Test;
 import org.python.core.PyCode;
 
@@ -11,6 +10,7 @@ import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -541,6 +541,39 @@ public class JythonScriptTest {
             assertNotNull(result);
             assertTrue(result instanceof Long);
             assertEquals(227963876171874L, result);
+        } catch (JythonScriptException e) {
+            fail("Unexpected error occurred.");
+        }
+    }
+
+    @Test
+    public void testEvaluate_returnList() {
+        String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testReturnList.py").getPath();
+        try {
+            PyCode compiledScript = JythonScript.compile(filePath);
+
+            Object[] result = (Object[]) JythonScript.evaluate(compiledScript);
+            assertNotNull(result);
+            assertEquals(12, result.length);
+            assertArrayEquals(new Object[] { "a", "b", "c", 1, 2, 3, "do", "re", "mi", 1.0f, 2.0f, 3.0f }, result);
+        } catch (JythonScriptException e) {
+            fail("Unexpected error occurred.");
+        }
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testEvaluate_returnDict() {
+        String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testReturnDict.py").getPath();
+        try {
+            PyCode compiledScript = JythonScript.compile(filePath);
+
+            Map<Object, Object> result = (Map<Object, Object>) JythonScript.evaluate(compiledScript);
+            assertNotNull(result);
+            assertEquals(3, result.size());
+            assertTrue(result.get("a").equals(1));
+            assertTrue(result.get("b").equals(2));
+            assertTrue(result.get("c").equals(3));
         } catch (JythonScriptException e) {
             fail("Unexpected error occurred.");
         }

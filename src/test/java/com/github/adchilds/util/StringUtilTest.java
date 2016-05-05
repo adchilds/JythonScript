@@ -1,6 +1,5 @@
 package com.github.adchilds.util;
 
-import com.github.adchilds.util.StringUtil;
 import org.junit.Test;
 
 import java.lang.reflect.Constructor;

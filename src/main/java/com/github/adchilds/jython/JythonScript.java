@@ -11,6 +11,8 @@ import org.python.util.PythonInterpreter;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * {@link JythonScript} provides an easy hook for executing and/or evaluating Python expressions or scripts in the Java
@@ -364,6 +366,8 @@ public class JythonScript {
      *     <li>{@link PyString} to {@link String}</li>
      *     <li>{@link PyFloat} to float</li>
      *     <li>{@link PyLong} to long</li>
+     *     <li>{@link PyList} to an array of {@link Object}s</li>
+     *     <li>{@link PyDictionary} to a {@link Map} of {@link Object}s</li>
      * </ul>
      *
      * @param object the object to convert to it's equivalent Java type
@@ -385,9 +389,51 @@ public class JythonScript {
             return Py.py2float(object);
         } else if (object instanceof PyLong) {
             return Py.py2long(object);
+        } else if (object instanceof PyList) {
+            return parsePyObjectList(((PyList) object).getArray());
+        } else if (object instanceof PyDictionary) {
+            return parsePyObjectDict(((PyDictionary) object).getMap());
         }
 
         return null;
+    }
+
+    /**
+     * Converts the given array of {@link PyObject}s to an array of the corresponding Java types for each value in the array.
+     *
+     * @param pyObjects an array of {@link PyObject}s to parse
+     * @return a new array of {@link Object}s
+     */
+    private static Object[] parsePyObjectList(PyObject[] pyObjects) {
+        Object[] objects = new Object[pyObjects.length];
+
+        int index = 0;
+        for (PyObject pyObject : pyObjects) {
+            objects[index] = parseResult(pyObject);
+
+            index++;
+        }
+
+        return objects;
+    }
+
+    /**
+     * Converts the given {@link Map} of {@link PyObject}s to a Map of the corresponding Java types.
+     *
+     * @param pyDict the dictionary to parse
+     * @return a new {@link Map} of {@link Object}s
+     */
+    private static Map<Object, Object> parsePyObjectDict(Map<PyObject, PyObject> pyDict) {
+        Map<Object, Object> objects = new HashMap<>();
+
+        for (Map.Entry entry : pyDict.entrySet()) {
+            Object key = parseResult((PyObject) entry.getKey());
+            Object value = parseResult((PyObject) entry.getValue());
+
+            objects.put(key, value);
+        }
+
+        return objects;
     }
 
     // Don't allow this class to be instantiated

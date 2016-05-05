@@ -1,6 +1,5 @@
 package com.github.adchilds.util;
 
-import com.github.adchilds.util.FileUtil;
 import org.junit.Test;
 
 import java.io.File;
