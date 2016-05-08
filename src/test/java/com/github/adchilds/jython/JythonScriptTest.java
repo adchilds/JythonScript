@@ -1,5 +1,6 @@
 package com.github.adchilds.jython;
 
+import com.github.adchilds.jython.exception.JythonResultNotFoundException;
 import com.github.adchilds.jython.exception.JythonScriptException;
 import org.junit.Test;
 import org.python.core.PyCode;
@@ -106,21 +107,21 @@ public class JythonScriptTest {
         // Null
         try {
             JythonScript.evaluate((String) null);
-        } catch (Exception e) {
+        } catch (JythonScriptException e) {
             // This is expected
         }
 
         // Empty
         try {
             JythonScript.evaluate("");
-        } catch (Exception e) {
+        } catch (JythonScriptException e) {
             // This is expected
         }
 
         // Invalid
         try {
             JythonScript.evaluate("/Users/test/notfound.py");
-        } catch (Exception e) {
+        } catch (JythonScriptException e) {
             // This is expected
         }
 
@@ -139,7 +140,7 @@ public class JythonScriptTest {
 
             result = JythonScript.evaluate(filePath, -1, 20);
             assertEquals(-20, result);
-        } catch (Exception e) {
+        } catch (JythonScriptException e) {
             fail("Script execution failed. error=[" + e + "]");
         }
     }
@@ -149,21 +150,21 @@ public class JythonScriptTest {
         // Null
         try {
             JythonScript.execute((String) null);
-        } catch (Exception e) {
+        } catch (JythonScriptException e) {
             // This is expected
         }
 
         // Empty
         try {
             JythonScript.execute("");
-        } catch (Exception e) {
+        } catch (JythonScriptException e) {
             // This is expected
         }
 
         // Invalid
         try {
             JythonScript.execute("/Users/test/notfound.py");
-        } catch (Exception e) {
+        } catch (JythonScriptException e) {
             // This is expected
         }
 
@@ -172,7 +173,7 @@ public class JythonScriptTest {
             String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testExecute.py").getPath();
 
             JythonScript.execute(filePath);
-        } catch (Exception e) {
+        } catch (JythonScriptException e) {
             fail("Script execution failed.");
         }
     }
@@ -182,21 +183,21 @@ public class JythonScriptTest {
         // Null
         try {
             JythonScript.evaluate((File) null);
-        } catch (Exception e) {
+        } catch (JythonScriptException e) {
             // This is expected
         }
 
         // Empty
         try {
             JythonScript.evaluate(new File(""));
-        } catch (Exception e) {
+        } catch (JythonScriptException e) {
             // This is expected
         }
 
         // Invalid
         try {
             JythonScript.evaluate("/Users/test/notfound.py");
-        } catch (Exception e) {
+        } catch (JythonScriptException e) {
             // This is expected
         }
 
@@ -216,21 +217,7 @@ public class JythonScriptTest {
 
             result = JythonScript.evaluate(file, -1, 20);
             assertEquals(-20, result);
-        } catch (Exception e) {
-            fail("Script execution failed. error=[" + e + "]");
-        }
-    }
-
-    @Test
-    public void testEvaluate_unsupportedReturnType() {
-        // Valid
-        try {
-            String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testReturnUnsupportedType.py").getPath();
-            Object result = JythonScript.evaluate(filePath);
-
-            assertNotNull(result);
-            assertTrue(result instanceof PyObject);
-        } catch (Exception e) {
+        } catch (JythonScriptException e) {
             fail("Script execution failed. error=[" + e + "]");
         }
     }
@@ -240,21 +227,21 @@ public class JythonScriptTest {
         // Null
         try {
             JythonScript.execute((File) null);
-        } catch (Exception e) {
+        } catch (JythonScriptException e) {
             // This is expected
         }
 
         // Empty
         try {
             JythonScript.execute(new File(""));
-        } catch (Exception e) {
+        } catch (JythonScriptException e) {
             // This is expected
         }
 
         // Invalid
         try {
             JythonScript.execute(new File("/Users/test/notfound.py"));
-        } catch (Exception e) {
+        } catch (JythonScriptException e) {
             // This is expected
         }
 
@@ -263,7 +250,7 @@ public class JythonScriptTest {
             String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testExecute.py").getPath();
 
             JythonScript.execute(new File(filePath));
-        } catch (Exception e) {
+        } catch (JythonScriptException e) {
             fail("Script execution failed.");
         }
     }
@@ -273,7 +260,7 @@ public class JythonScriptTest {
         // Null
         try {
             JythonScript.evaluate((InputStream) null);
-        } catch (Exception e) {
+        } catch (JythonScriptException e) {
             // This is expected
         }
 
@@ -317,7 +304,7 @@ public class JythonScriptTest {
         // Null
         try {
             JythonScript.execute((InputStream) null);
-        } catch (Exception e) {
+        } catch (JythonScriptException e) {
             // This is expected
         }
 
@@ -350,8 +337,19 @@ public class JythonScriptTest {
         // Null
         try {
             Object result = JythonScript.evaluate((PyCode) null);
+        } catch (JythonScriptException e) {
+            // This is expected
+        }
+
+        // No result
+        try {
+            String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testResultNotFound.py").getPath();
+            PyCode compiledScript = JythonScript.compile(filePath);
+
+            JythonScript.evaluate(compiledScript);
         } catch (Exception e) {
             // This is expected
+            assertTrue(e instanceof JythonResultNotFoundException);
         }
 
         // Valid
@@ -380,7 +378,7 @@ public class JythonScriptTest {
         // Null
         try {
             JythonScript.execute((PyCode) null);
-        } catch (Exception e) {
+        } catch (JythonScriptException e) {
             // This is expected
         }
 
@@ -612,6 +610,20 @@ public class JythonScriptTest {
             }
         } catch (JythonScriptException e) {
             fail("Unexpected error occurred.");
+        }
+    }
+
+    @Test
+    public void testEvaluate_unsupportedReturnType() {
+        // Valid
+        try {
+            String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testReturnUnsupportedType.py").getPath();
+            Object result = JythonScript.evaluate(filePath);
+
+            assertNotNull(result);
+            assertTrue(result instanceof PyObject);
+        } catch (JythonScriptException e) {
+            fail("Script execution failed. error=[" + e + "]");
         }
     }
 
