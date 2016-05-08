@@ -359,7 +359,7 @@ public class JythonScript {
 
     /**
      * Given a {@link PyObject} attempts to convert the object to it's Java representation. If an equivalent java type
-     * cannot be found, null is returned.
+     * cannot be found, the original PyObject is returned.
      *
      * Current supported type conversions:
      * <ul>
@@ -372,8 +372,8 @@ public class JythonScript {
      *     <li>{@link PyDictionary} to a {@link Map} of {@link Object}s</li>
      *     <li>{@link PySet} to a {@link Set} of {@link Object}s</li>
      * </ul>
-     *2
-     * @param object the object to convert to it's equivalent Java type
+     *
+     * @param object the object to convert to it's equivalent Java type, if supported; otherwise, returns the unconverted {@link PyObject}
      * @return the Java type representation of the given {@link PyObject}
      */
     private static Object parseResult(PyObject object) {
@@ -400,7 +400,7 @@ public class JythonScript {
             return parsePyObjectSet(((PySet) object).getSet());
         }
 
-        return null;
+        return object;
     }
 
     /**

@@ -3,6 +3,7 @@ package com.github.adchilds.jython;
 import com.github.adchilds.jython.exception.JythonScriptException;
 import org.junit.Test;
 import org.python.core.PyCode;
+import org.python.core.PyObject;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -215,6 +216,20 @@ public class JythonScriptTest {
 
             result = JythonScript.evaluate(file, -1, 20);
             assertEquals(-20, result);
+        } catch (Exception e) {
+            fail("Script execution failed. error=[" + e + "]");
+        }
+    }
+
+    @Test
+    public void testEvaluate_unsupportedReturnType() {
+        // Valid
+        try {
+            String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testReturnUnsupportedType.py").getPath();
+            Object result = JythonScript.evaluate(filePath);
+
+            assertNotNull(result);
+            assertTrue(result instanceof PyObject);
         } catch (Exception e) {
             fail("Script execution failed. error=[" + e + "]");
         }
