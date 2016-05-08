@@ -12,7 +12,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * {@link JythonScript} provides an easy hook for executing and/or evaluating Python expressions or scripts in the Java
@@ -368,8 +370,9 @@ public class JythonScript {
      *     <li>{@link PyLong} to long</li>
      *     <li>{@link PyList} to an array of {@link Object}s</li>
      *     <li>{@link PyDictionary} to a {@link Map} of {@link Object}s</li>
+     *     <li>{@link PySet} to a {@link Set} of {@link Object}s</li>
      * </ul>
-     *
+     *2
      * @param object the object to convert to it's equivalent Java type
      * @return the Java type representation of the given {@link PyObject}
      */
@@ -393,6 +396,8 @@ public class JythonScript {
             return parsePyObjectList(((PyList) object).getArray());
         } else if (object instanceof PyDictionary) {
             return parsePyObjectDict(((PyDictionary) object).getMap());
+        } else if (object instanceof PySet) {
+            return parsePyObjectSet(((PySet) object).getSet());
         }
 
         return null;
@@ -431,6 +436,22 @@ public class JythonScript {
             Object value = parseResult((PyObject) entry.getValue());
 
             objects.put(key, value);
+        }
+
+        return objects;
+    }
+
+    /**
+     * Converts the given {@link Set} of {@link PyObject}s to a Set of the corresponding Java types.
+     *
+     * @param pySet the set to parse
+     * @return a new {@link Set} of {@link Object}s
+     */
+    private static Set<Object> parsePyObjectSet(Set<PyObject> pySet) {
+        Set<Object> objects = new HashSet<>();
+
+        for (PyObject pyObject : pySet) {
+            objects.add(parseResult(pyObject));
         }
 
         return objects;

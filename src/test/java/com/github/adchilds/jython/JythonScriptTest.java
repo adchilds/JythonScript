@@ -11,6 +11,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -574,6 +575,26 @@ public class JythonScriptTest {
             assertTrue(result.get("a").equals(1));
             assertTrue(result.get("b").equals(2));
             assertTrue(result.get("c").equals(3));
+        } catch (JythonScriptException e) {
+            fail("Unexpected error occurred.");
+        }
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testEvaluate_returnSet() {
+        String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testReturnSet.py").getPath();
+        try {
+            PyCode compiledScript = JythonScript.compile(filePath);
+
+            Set<Object> result = (Set<Object>) JythonScript.evaluate(compiledScript);
+            assertNotNull(result);
+            assertEquals(9, result.size());
+
+            Object[] expected = new Object[] { "a", "b", "c", 1, 2, 3, "do", "re", "mi" };
+            for (Object object : expected) {
+                assertTrue(result.contains(object));
+            }
         } catch (JythonScriptException e) {
             fail("Unexpected error occurred.");
         }
