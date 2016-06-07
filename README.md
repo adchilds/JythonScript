@@ -3,8 +3,8 @@
 [![Build Status](https://travis-ci.org/adchilds/JythonScript.svg?branch=develop)](https://travis-ci.org/adchilds/JythonScript) [![Coverage Status](https://coveralls.io/repos/github/adchilds/JythonScript/badge.svg?branch=develop)](https://coveralls.io/github/adchilds/JythonScript?branch=develop)
 
 ## Description:
-JythonScript provides an easy to use wrapper for executing and/or evaluating Python expressions and scripts in the Java 
-Runtime Environment.
+JythonScript is a simple Jython wrapper for easier execution and/or evaluation of Python expressions and scripts at 
+runtime for JVM-based languages.
 
 ## Dependencies:
 None. JythonScript packages the Jython standalone JAR as part of it's distribution, so no further dependencies are
@@ -68,6 +68,6 @@ required.
   Output: "Result = [25]"
 
 ## Useful Links:
-* JythonScript - https://github.com/adchilds/jythonutil
+* JythonScript - https://github.com/adchilds/JythonScript
 * Python - https://www.python.org
 * Jython - http://www.jython.org

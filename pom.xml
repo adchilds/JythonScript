@@ -9,6 +9,33 @@
     <version>0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
+    <name>JythonScript</name>
+    <description>A simple Jython wrapper to allow JVM-based projects to execute or evaluate Python scripts at runtime with ease.</description>
+    <url>https://github.com/adchilds/JythonScript</url>
+
+    <licenses>
+        <license>
+            <name>MIT License, Version 2.0</name>
+            <url>https://opensource.org/licenses/mit-license.php</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <url>https://github.com/adchilds/JythonScript</url>
+        <connection>scm:git:git://github.com/adchilds/JythonScript.git</connection>
+        <developerConnection>scm:git:git@github.com:adchilds/JythonScript.git</developerConnection>
+    </scm>
+
+    <developers>
+        <developer>
+            <id>adchilds</id>
+            <name>Adam Childs</name>
+            <email>adamdchilds@gmail.com</email>
+            <url>https://github.com/adchilds</url>
+        </developer>
+    </developers>
+
     <properties>
         <jython.standalone.version>2.7.0</jython.standalone.version>
         <junit.version>4.12</junit.version>
@@ -24,6 +51,34 @@
                     <source>1.8</source>
                     <target>1.8</target>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.10.3</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <!-- Cobertura -->

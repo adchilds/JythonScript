@@ -17,14 +17,14 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * {@link JythonScript} provides an easy hook for executing and/or evaluating Python expressions or scripts in the Java
- * Runtime Environment. JythonScript packages the Jython standalone JAR as part of it's distribution, so no further
+ * {@link JythonScript} provides an easy to use wrapper for executing and/or evaluating Python expressions or scripts
+ * for JVM-based languages. JythonScript packages the Jython standalone JAR as part of it's distribution, so no further
  * dependencies should be required.
  *
  * JythonScript operates on a couple of select criteria:
  * <ol>
- *     <li>A local (to the JVM host operating system) Jython script</li>
- *     <li>Optional arguments passed to the given script</li>
+ *     <li>A Jython or Python script accessible by the JVM via a {@link String} file path, {@link File}, or {@link InputStream}</li>
+ *     <li>Optional arguments to be passed to the given script</li>
  * </ol>
  *
  * To use this utility class, you must follow a few strict rules in creating Jython scripts:
@@ -46,15 +46,15 @@ import java.util.Set;
  *
  * When consuming arguments passed to a Jython script via the 'Object... args' parameter of an execute or evaluate
  * method, the arguments will be available via Python's sys.argv list. It's important to note that the first argument
- * (index 0 [sys.argv[0]]) is reserved. Therefore, Jython scripts should always begin accessing these arguments via the
- * second index of sys.argv (i.e. sys.argv[1]).
+ * (index 0 [sys.argv[0]]) is reserved. Therefore, Jython scripts should always access these arguments beginning with
+ * the second index of sys.argv (i.e. sys.argv[1]).
  *
  * <br />
  * <br />
  *
  * JythonScript provides {@code #compile(...)} functions that compile the given scripts into {@link PyCode} objects. For
  * speed increases at runtime, it's better to pre-compile Jython scripts with these functions, maintain the PyCode
- * objects via an in-memory cache or local variable, and execute or evaluate with the compiled scripts. JythonScript
+ * objects via an in-memory cache or local variable, and execute or evaluate against the compiled scripts. JythonScript
  * provides the necessary {@link #evaluate(PyCode, Object...)} and {@link #execute(PyCode, Object...)} methods to
  * foster these speed increases.
  *
@@ -72,7 +72,7 @@ import java.util.Set;
  *
  * For more information, follow the respective links to documentation:
  * <ul>
- *     <li>JythonScript - https://github.com/adchilds/jythonutil</li>
+ *     <li>JythonScript - https://github.com/adchilds/JythonScript</li>
  *     <li>Python - https://www.python.org</li>
  *     <li>Jython - http://www.jython.org</li>
  * </ul>
@@ -91,7 +91,7 @@ public class JythonScript {
      *
      * @param filePath the absolute path of the Jython file to compile
      * @return a compiled Jython script
-     * @throws JythonScriptException
+     * @throws JythonScriptException when the given file path empty or null
      */
     public static PyCode compile(String filePath) throws JythonScriptException {
         // Make sure the file path is is not null or empty
@@ -108,7 +108,7 @@ public class JythonScript {
      *
      * @param file the Jython file to compile
      * @return a compiled Jython script
-     * @throws JythonScriptException
+     * @throws JythonScriptException when the given file is null or is not a file (i.e. a directory)
      */
     public static PyCode compile(File file) throws JythonScriptException {
         if (file == null) {
