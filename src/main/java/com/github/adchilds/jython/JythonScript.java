@@ -49,8 +49,8 @@ import java.util.Set;
  * (index 0 [sys.argv[0]]) is reserved. Therefore, Jython scripts should always access these arguments beginning with
  * the second index of sys.argv (i.e. sys.argv[1]).
  *
- * <br />
- * <br />
+ * <br>
+ * <br>
  *
  * JythonScript provides {@code #compile(...)} functions that compile the given scripts into {@link PyCode} objects. For
  * speed increases at runtime, it's better to pre-compile Jython scripts with these functions, maintain the PyCode
@@ -58,8 +58,8 @@ import java.util.Set;
  * provides the necessary {@link #evaluate(PyCode, Object...)} and {@link #execute(PyCode, Object...)} methods to
  * foster these speed increases.
  *
- * <br />
- * <br />
+ * <br>
+ * <br>
  *
  * Note: JythonScript does not dictate any other strict code structure. You are free to use any of the features provided
  * by Java, Python and Jython, including, but not limited to:
@@ -91,7 +91,7 @@ public class JythonScript {
      *
      * @param filePath the absolute path of the Jython file to compile
      * @return a compiled Jython script
-     * @throws JythonScriptException when the given file path empty or null
+     * @throws JythonScriptException when the given file path is empty or null
      */
     public static PyCode compile(String filePath) throws JythonScriptException {
         // Make sure the file path is is not null or empty
@@ -137,7 +137,7 @@ public class JythonScript {
      * @param scriptPath the fully qualified path of the Jython script to execute
      * @param args arguments to be passed to the script
      * @return the result from executing the given script
-     * @throws JythonScriptException
+     * @throws JythonScriptException when the given file path is null, a directory, or cannot be found
      */
     public static Object evaluate(String scriptPath, Object... args) throws JythonScriptException {
         // Ensure that the scriptRelativePath is not null or empty
@@ -163,7 +163,7 @@ public class JythonScript {
      * @param scriptFile the Jython script to execute
      * @param args arguments to be passed to the script
      * @return the result from executing the given script
-     * @throws JythonScriptException
+     * @throws JythonScriptException when the given file is null, a directory, or cannot be found
      */
     public static Object evaluate(File scriptFile, Object... args) throws JythonScriptException {
         // Ensure that the script is not null
@@ -190,7 +190,7 @@ public class JythonScript {
      * @param inputStream the {@link InputStream} that represents the Jython script to be executed
      * @param args arguments to be passed to the script
      * @return the result from executing the given script
-     * @throws JythonScriptException
+     * @throws JythonScriptException when a script execution error occurs or when a local Python variable named 'result' is not found
      */
     public static Object evaluate(InputStream inputStream, Object... args) throws JythonScriptException {
         // Execute the script
@@ -213,7 +213,7 @@ public class JythonScript {
      * @param pyCode the compiled Jython script to evaluate
      * @param args arguments to be passed to the script
      * @return the result from executing the given script
-     * @throws JythonScriptException
+     * @throws JythonScriptException when a script execution error occurs or when a local Python variable named 'result' is not found
      */
     public static Object evaluate(PyCode pyCode, Object... args) throws JythonScriptException {
         // Execute the script
@@ -235,7 +235,7 @@ public class JythonScript {
      *
      * @param scriptPath the fully qualified path of the Jython script to execute
      * @param args arguments to be passed to the script
-     * @throws JythonScriptException
+     * @throws JythonScriptException when the given file path is null, a directory, or cannot be found
      */
     public static void execute(String scriptPath, Object... args) throws JythonScriptException {
         // Ensure that the scriptRelativePath is not null or empty
@@ -260,7 +260,7 @@ public class JythonScript {
      *
      * @param scriptFile the Jython script to execute
      * @param args arguments to be passed to the script
-     * @throws JythonScriptException
+     * @throws JythonScriptException when the given file is null, a directory, or cannot be found
      */
     public static void execute(File scriptFile, Object... args) throws JythonScriptException {
         // Ensure that the script is not null
@@ -285,7 +285,7 @@ public class JythonScript {
      *
      * @param inputStream the {@link InputStream} that represents the Jython script to be executed
      * @param args arguments to be passed to the script
-     * @throws JythonScriptException
+     * @throws JythonScriptException when the given inputstream is null or a script execution error occurs
      */
     public static void execute(InputStream inputStream, Object... args) throws JythonScriptException {
         if (inputStream == null) {
@@ -308,7 +308,7 @@ public class JythonScript {
      *
      * @param pyCode the compiled Jython script to evaluate
      * @param args arguments to be passed to the script
-     * @throws JythonScriptException
+     * @throws JythonScriptException when the given PyCode is null or a script execution error occurs
      */
     public static void execute(PyCode pyCode, Object... args) throws JythonScriptException {
         if (pyCode == null) {

@@ -22,6 +22,7 @@ public class FileUtil {
      *
      * @param object the object to convert to an input stream
      * @return a new {@link InputStream} created from the given {@code object}
+     * @throws IOException when the given Object cannot be converted to a FileInputStream
      */
     public static InputStream getFileInputStream(Object object) throws IOException {
         if (object instanceof String) {
@@ -38,7 +39,7 @@ public class FileUtil {
      *
      * @param file the {@link File} to read the contents of
      * @return a new {@link String} that contains the contents of the given file
-     * @throws IOException
+     * @throws IOException when the given File cannot be found or read from
      */
     public static String readFully(File file) throws IOException {
         if (file == null) {
@@ -54,7 +55,7 @@ public class FileUtil {
      * @param inputStream the {@link InputStream} to read the contents of
      * @param encoding the character encoding that the resulting {@link String} should be (i.e. UTF-8)
      * @return a new {@link String} that contains the contents of the given stream
-     * @throws IOException
+     * @throws IOException when the given InputStream cannot be read from
      */
     public static String readFully(InputStream inputStream, String encoding) throws IOException {
         return new String(readFully(inputStream), encoding);
@@ -65,7 +66,7 @@ public class FileUtil {
      *
      * @param inputStream the {@link InputStream} to read the contents of
      * @return a new array of bytes that contains the contents of the given stream
-     * @throws IOException
+     * @throws IOException when the given InputStream cannot be read from
      */
     private static byte[] readFully(InputStream inputStream) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
