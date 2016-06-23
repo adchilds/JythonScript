@@ -6,7 +6,7 @@
 
     <groupId>com.github.adchilds</groupId>
     <artifactId>jythonscript</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>1.0</version>
     <packaging>jar</packaging>
 
     <name>JythonScript</name>
