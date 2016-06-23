@@ -1,4 +1,8 @@
+# Folders
 .idea
-.DS_Store
 target
+
+# Files
+.DS_Store
 *.iml
+settings.xml
