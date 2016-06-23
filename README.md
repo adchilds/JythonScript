@@ -1,10 +1,18 @@
-# JythonScript v0.1
+# JythonScript v1.0
 
 [![Build Status](https://travis-ci.org/adchilds/JythonScript.svg?branch=develop)](https://travis-ci.org/adchilds/JythonScript) [![Coverage Status](https://coveralls.io/repos/github/adchilds/JythonScript/badge.svg?branch=develop)](https://coveralls.io/github/adchilds/JythonScript?branch=develop)
 
 ## Description:
 JythonScript is a simple Jython wrapper for easier execution and/or evaluation of Python expressions and scripts at 
 runtime for JVM-based languages.
+
+## Maven
+
+    <dependency>
+      <groupId>com.github.adchilds</groupId>
+      <artifactId>jythonscript</artifactId>
+      <version>1.0</version>
+    </dependency>
 
 ## Dependencies:
 None. JythonScript packages the Jython standalone JAR as part of it's distribution, so no further dependencies are
