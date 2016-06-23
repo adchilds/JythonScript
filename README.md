@@ -1,6 +1,6 @@
 # JythonScript v1.0
 
-[![Build Status](https://travis-ci.org/adchilds/JythonScript.svg?branch=develop)](https://travis-ci.org/adchilds/JythonScript) [![Coverage Status](https://coveralls.io/repos/github/adchilds/JythonScript/badge.svg?branch=develop)](https://coveralls.io/github/adchilds/JythonScript?branch=develop)
+[![Build Status](https://travis-ci.org/adchilds/JythonScript.svg?branch=develop)](https://travis-ci.org/adchilds/JythonScript) [![Coverage Status](https://coveralls.io/repos/github/adchilds/JythonScript/badge.svg?branch=develop)](https://coveralls.io/github/adchilds/JythonScript?branch=develop) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.adchilds/jythonscript/badge.svg)](http://search.maven.org/#artifactdetails%7Ccom.github.adchilds%7Cjythonscript%7C1.0%7C)
 
 ## Description:
 JythonScript is a simple Jython wrapper for easier execution and/or evaluation of Python expressions and scripts at 
