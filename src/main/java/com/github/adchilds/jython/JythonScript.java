@@ -11,6 +11,8 @@ import org.python.util.PythonInterpreter;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -78,7 +80,7 @@ import java.util.Set;
  * </ul>
  *
  * @author Adam Childs
- * @since 0.1
+ * @since 1.0
  */
 public class JythonScript {
 
@@ -92,15 +94,39 @@ public class JythonScript {
      * @param filePath the absolute path of the Jython file to compile
      * @return a compiled Jython script
      * @throws JythonScriptException when the given file path is empty or null
+     * @since 1.0
      */
     public static PyCode compile(String filePath) throws JythonScriptException {
         // Make sure the file path is is not null or empty
         if (StringUtil.isBlank(filePath)) {
-            throw new JythonScriptException("Given path is not a file. path=[" + filePath + "]");
+            throw new JythonScriptException("Null or empty path is not a file.");
         }
 
         // Compile the script
         return compile(new File(filePath));
+    }
+
+    /**
+     * Compiles the Jython script at the given {@code fileUrl} into a {@link PyCode} object.
+     *
+     * @param fileUrl the {@link URL} to a Jython file to compile
+     * @return a compile Jython script
+     * @throws JythonScriptException when the given URL is empty, null, or not a valid path
+     * @since 2.0
+     */
+    public static PyCode compile(URL fileUrl) throws JythonScriptException {
+        if (fileUrl == null) {
+            throw new JythonScriptException("Null path is not a URL.");
+        }
+
+        File file;
+        try {
+            file = new File(fileUrl.toURI());
+        } catch (URISyntaxException e) {
+            throw new JythonScriptException("Could not convert URL to File.", e);
+        }
+
+        return compile(file);
     }
 
     /**
@@ -109,6 +135,7 @@ public class JythonScript {
      * @param file the Jython file to compile
      * @return a compiled Jython script
      * @throws JythonScriptException when the given file is null or is not a file (i.e. a directory)
+     * @since 1.0
      */
     public static PyCode compile(File file) throws JythonScriptException {
         if (file == null) {
@@ -131,13 +158,16 @@ public class JythonScript {
     }
 
     /**
-     * Evaluates the Jython script at the given {@code scriptPath}, returning the result as it's equivalent Java type.
-     * Accepts optional arguments to be passed to the script at runtime.
+     * Evaluates the Jython script at the given {@code scriptPath}, returning the result as its equivalent Java type.
+     * Accepts optional arguments to be passed to the script at runtime. {@code args} should be interpreted as 'sys.argv'
+     * arguments in the given script. Note that the arguments passed in here will begin at the first index in a Jython
+     * scripts sys.argv list.
      *
      * @param scriptPath the fully qualified path of the Jython script to execute
      * @param args arguments to be passed to the script
      * @return the result from executing the given script
      * @throws JythonScriptException when the given file path is null, a directory, or cannot be found
+     * @since 1.0
      */
     public static Object evaluate(String scriptPath, Object... args) throws JythonScriptException {
         // Ensure that the scriptRelativePath is not null or empty
@@ -157,13 +187,51 @@ public class JythonScript {
     }
 
     /**
-     * Evaluates the given Jython script, returning the result as it's equivalent Java type. Accepts optional arguments
-     * to be passed to the script at runtime.
+     * Evaluates the Jython script at the given {@code scriptUrl}, returning the result as its equivalent Java type.
+     * Accepts optional arguments to be passed to the script at runtime. {@code args} should be interpreted as 'sys.argv'
+     * arguments in the given script. Note that the arguments passed in here will begin at the first index in a Jython
+     * scripts sys.argv list.
+     *
+     * @param scriptUrl the {@link URL} to a Jython script to execute
+     * @param args arguments to be passed to the script
+     * @return the result from executing the given script
+     * @throws JythonScriptException when the given script is null, a directory, or cannot be found
+     * @since 2.0
+     */
+    public static Object evaluate(URL scriptUrl, Object... args) throws JythonScriptException {
+        if (scriptUrl == null) {
+            throw new JythonScriptException("Null path is not a URL.");
+        }
+
+        // Convert the URL to a File
+        File file;
+        try {
+            file = new File(scriptUrl.toURI());
+        } catch (URISyntaxException e) {
+            throw new JythonScriptException("Could not convert URL to File.", e);
+        }
+
+        // Open an InputStream for the file
+        InputStream inputStream;
+        try {
+            inputStream = FileUtil.getFileInputStream(file);
+        } catch (Exception e) {
+            throw new JythonScriptNotFoundException("Could not open Jython script from location=[" + scriptUrl.getPath() + "]", e);
+        }
+
+        return evaluate(inputStream, args);
+    }
+
+    /**
+     * Evaluates the given Jython script, returning the result as its equivalent Java type. Accepts optional arguments
+     * to be passed to the script at runtime. {@code args} should be interpreted as 'sys.argv' arguments in the given
+     * script. Note that the arguments passed in here will begin at the first index in a Jython scripts sys.argv list.
      *
      * @param scriptFile the Jython script to execute
      * @param args arguments to be passed to the script
      * @return the result from executing the given script
      * @throws JythonScriptException when the given file is null, a directory, or cannot be found
+     * @since 1.0
      */
     public static Object evaluate(File scriptFile, Object... args) throws JythonScriptException {
         // Ensure that the script is not null
@@ -184,13 +252,15 @@ public class JythonScript {
     }
 
     /**
-     * Evaluates the given Jython script, returning the result as it's equivalent Java type. Accepts optional arguments
-     * to be passed to the script at runtime.
+     * Evaluates the given Jython script, returning the result as its equivalent Java type. Accepts optional arguments
+     * to be passed to the script at runtime. {@code args} should be interpreted as 'sys.argv' arguments in the given
+     * script. Note that the arguments passed in here will begin at the first index in a Jython scripts sys.argv list.
      *
      * @param inputStream the {@link InputStream} that represents the Jython script to be executed
      * @param args arguments to be passed to the script
      * @return the result from executing the given script
      * @throws JythonScriptException when a script execution error occurs or when a local Python variable named 'result' is not found
+     * @since 1.0
      */
     public static Object evaluate(InputStream inputStream, Object... args) throws JythonScriptException {
         // Execute the script
@@ -208,12 +278,14 @@ public class JythonScript {
 
     /**
      * Evaluates the given Jython script, returning the result as it's equivalent Java type. Accepts optional arguments
-     * to be passed to the script at runtime.
+     * to be passed to the script at runtime. {@code args} should be interpreted as 'sys.argv' arguments in the given
+     * script. Note that the arguments passed in here will begin at the first index in a Jython scripts sys.argv list.
      *
      * @param pyCode the compiled Jython script to evaluate
      * @param args arguments to be passed to the script
      * @return the result from executing the given script
      * @throws JythonScriptException when a script execution error occurs or when a local Python variable named 'result' is not found
+     * @since 1.0
      */
     public static Object evaluate(PyCode pyCode, Object... args) throws JythonScriptException {
         // Execute the script
@@ -231,11 +303,13 @@ public class JythonScript {
 
     /**
      * Executes the Jython script at the given {@code scriptPath} with optional arguments passed to the script at
-     * runtime.
+     * runtime. {@code args} should be interpreted as 'sys.argv' arguments in the given script. Note that the arguments
+     * passed in here will begin at the first index in a Jython scripts sys.argv list.
      *
      * @param scriptPath the fully qualified path of the Jython script to execute
      * @param args arguments to be passed to the script
      * @throws JythonScriptException when the given file path is null, a directory, or cannot be found
+     * @since 1.0
      */
     public static void execute(String scriptPath, Object... args) throws JythonScriptException {
         // Ensure that the scriptRelativePath is not null or empty
@@ -256,11 +330,48 @@ public class JythonScript {
     }
 
     /**
-     * Executes the given Jython script with optional arguments passed to the script at runtime.
+     * Executes the Jython script at the given {@code scriptUrl} with optional arguments passed to the script at
+     * runtime. {@code args} should be interpreted as 'sys.argv' arguments in the given script. Note that the arguments
+     * passed in here will begin at the first index in a Jython scripts sys.argv list.
+     *
+     * @param scriptUrl the {@link URL} to a Jython script to execute
+     * @param args arguments to be passed to the script
+     * @throws JythonScriptException when the given file is null, a directory, or cannot be found
+     * @since 2.0
+     */
+    public static void execute(URL scriptUrl, Object... args) throws JythonScriptException {
+        if (scriptUrl == null) {
+            throw new JythonScriptException("Null path is not a URL.");
+        }
+
+        // Convert the URL to a File
+        File file;
+        try {
+            file = new File(scriptUrl.toURI());
+        } catch (URISyntaxException e) {
+            throw new JythonScriptException("Could not convert URL to File.", e);
+        }
+
+        // Open an InputStream for the file
+        InputStream inputStream;
+        try {
+            inputStream = FileUtil.getFileInputStream(file);
+        } catch (Exception e) {
+            throw new JythonScriptNotFoundException("Could not open Jython script from location=[" + scriptUrl.getPath() + "]", e);
+        }
+
+        execute(inputStream, args);
+    }
+
+    /**
+     * Executes the given Jython script with optional arguments passed to the script at runtime. {@code args} should be
+     * interpreted as 'sys.argv' arguments in the given script. Note that the arguments passed in here will begin at
+     * the first index in a Jython scripts sys.argv list.
      *
      * @param scriptFile the Jython script to execute
      * @param args arguments to be passed to the script
      * @throws JythonScriptException when the given file is null, a directory, or cannot be found
+     * @since 1.0
      */
     public static void execute(File scriptFile, Object... args) throws JythonScriptException {
         // Ensure that the script is not null
@@ -281,11 +392,14 @@ public class JythonScript {
     }
 
     /**
-     * Executes the given Jython script with optional arguments passed to the script at runtime.
+     * Executes the given Jython script with optional arguments passed to the script at runtime. {@code args} should be
+     * interpreted as 'sys.argv' arguments in the given script. Note that the arguments passed in here will begin at
+     * the first index in a Jython scripts sys.argv list.
      *
      * @param inputStream the {@link InputStream} that represents the Jython script to be executed
      * @param args arguments to be passed to the script
      * @throws JythonScriptException when the given inputstream is null or a script execution error occurs
+     * @since 1.0
      */
     public static void execute(InputStream inputStream, Object... args) throws JythonScriptException {
         if (inputStream == null) {
@@ -304,11 +418,14 @@ public class JythonScript {
     }
 
     /**
-     * Executes the given Jython script with optional arguments passed to the script at runtime.
+     * Executes the given Jython script with optional arguments passed to the script at runtime. {@code args} should be
+     * interpreted as 'sys.argv' arguments in the given script. Note that the arguments passed in here will begin at
+     * the first index in a Jython scripts sys.argv list.
      *
      * @param pyCode the compiled Jython script to evaluate
      * @param args arguments to be passed to the script
      * @throws JythonScriptException when the given PyCode is null or a script execution error occurs
+     * @since 1.0
      */
     public static void execute(PyCode pyCode, Object... args) throws JythonScriptException {
         if (pyCode == null) {
@@ -378,7 +495,7 @@ public class JythonScript {
      */
     private static Object parseResult(PyObject object) {
         if (object == null) {
-            // We should never get here since evaluate provides this check; but, just incase.
+            // We should never get here since evaluate provides this check; but, just in case.
             return null;
         }
 
