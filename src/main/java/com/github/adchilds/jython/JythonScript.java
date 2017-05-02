@@ -150,11 +150,28 @@ public class JythonScript {
 
         // Compile the file, returning the associated PyCode object
         try {
-            return INTERPRETER.compile(FileUtil.readFully(file));
+            return compileString(FileUtil.readFully(file));
         } catch (IOException e) {
             throw new JythonScriptException("Could not compile the given file. file=[" +
                     file.getAbsolutePath() + "]", e);
         }
+    }
+
+    /**
+     * Compiles the given Jython script into a {@link PyCode} object.
+     *
+     * @param script the Jython script to compile
+     * @return a compiled Jython script
+     * @throws JythonScriptException when the given script is null or empty
+     * @since 2.0
+     */
+    public static PyCode compileString(String script) throws JythonScriptException {
+        if (StringUtil.isBlank(script)) {
+            throw new JythonScriptException("Given script was null or empty; cannot be compiled into PyCode.");
+        }
+
+        // Compile the script, returning the associated PyCode object
+        return INTERPRETER.compile(script);
     }
 
     /**

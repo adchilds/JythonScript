@@ -135,6 +135,70 @@ public class JythonScriptTest {
     }
 
     @Test(expected = JythonScriptException.class)
+    public void testCompileString_null() throws JythonScriptException {
+        JythonScript.compileString(null);
+    }
+
+    @Test
+    public void testCompileString_empty() throws JythonScriptException {
+        try {
+            JythonScript.compileString("");
+        } catch (JythonScriptException e) {
+            // This is expected
+        }
+
+        try {
+            JythonScript.compileString("    ");
+        } catch (JythonScriptException e) {
+            // This is expected
+        }
+
+        try {
+            JythonScript.compileString("\n");
+        } catch (JythonScriptException e) {
+            // This is expected
+        }
+
+        try {
+            JythonScript.compileString("\t");
+        } catch (JythonScriptException e) {
+            // This is expected
+        }
+
+        try {
+            JythonScript.compileString("\r");
+        } catch (JythonScriptException e) {
+            // This is expected
+        }
+    }
+
+    @Test
+    public void testCompileString_valid() {
+        String script = "from java.lang import System\n" +
+                "\n" +
+                "\n" +
+                "def test():\n" +
+                "    \"\"\"\n" +
+                "    Prints out a simple message for testin purposes.\n" +
+                "    \"\"\"\n" +
+                "    System.out.println('This is a Jython test.')\n" +
+                "    print 'This is a Python test.'\n" +
+                "\n" +
+                "\n" +
+                "if __name__ == '__main__':\n" +
+                "    test()";
+
+        PyCode compiledScript = null;
+        try {
+            compiledScript = JythonScript.compileString(script);
+        } catch (JythonScriptException e) {
+            fail("Compiling scripts failed. error=[" + e + "]");
+        }
+
+        assertNotNull(compiledScript);
+    }
+
+    @Test(expected = JythonScriptException.class)
     public void testEvaluate_filePathNull() throws JythonScriptException {
         JythonScript.evaluate((String) null);
     }
