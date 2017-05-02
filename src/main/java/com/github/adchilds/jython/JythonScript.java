@@ -122,7 +122,7 @@ public class JythonScript {
         File file;
         try {
             file = new File(fileUrl.toURI());
-        } catch (URISyntaxException e) {
+        } catch (Exception e) {
             throw new JythonScriptException("Could not convert URL to File.", e);
         }
 
@@ -224,7 +224,7 @@ public class JythonScript {
         File file;
         try {
             file = new File(scriptUrl.toURI());
-        } catch (URISyntaxException e) {
+        } catch (Exception e) {
             throw new JythonScriptException("Could not convert URL to File.", e);
         }
 
@@ -365,7 +365,7 @@ public class JythonScript {
         File file;
         try {
             file = new File(scriptUrl.toURI());
-        } catch (URISyntaxException e) {
+        } catch (Exception e) {
             throw new JythonScriptException("Could not convert URL to File.", e);
         }
 

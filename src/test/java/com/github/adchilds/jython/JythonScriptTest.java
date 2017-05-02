@@ -3,8 +3,7 @@ package com.github.adchilds.jython;
 import com.github.adchilds.jython.exception.JythonResultNotFoundException;
 import com.github.adchilds.jython.exception.JythonScriptException;
 import org.junit.Test;
-import org.python.core.PyCode;
-import org.python.core.PyObject;
+import org.python.core.*;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -86,6 +85,11 @@ public class JythonScriptTest {
     @Test(expected = JythonScriptException.class)
     public void testCompile_urlNull() throws JythonScriptException {
         JythonScript.compile((URL) null);
+    }
+
+    @Test(expected = JythonScriptException.class)
+    public void testCompile_urlInvalid() throws Exception {
+        JythonScript.compile(new URL("http://test"));
     }
 
     @Test
@@ -322,6 +326,16 @@ public class JythonScriptTest {
         JythonScript.evaluate((URL) null);
     }
 
+    @Test(expected = JythonScriptException.class)
+    public void testEvaluate_urlInvalid() throws Exception {
+        JythonScript.evaluate(new URL("http://test"));
+    }
+
+    @Test(expected = JythonScriptException.class)
+    public void testEvaluate_urlNotFound() throws Exception {
+        JythonScript.evaluate(new URL("file:///test/test"));
+    }
+
     @Test
     public void testEvaluate_urlValid() throws JythonScriptException {
         URL scriptUrl = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testEvaluate.py");
@@ -346,6 +360,16 @@ public class JythonScriptTest {
     @Test(expected = JythonScriptException.class)
     public void testExecute_urlNull() throws JythonScriptException {
         JythonScript.execute((URL) null);
+    }
+
+    @Test(expected = JythonScriptException.class)
+    public void testExecute_urlInvalid() throws Exception {
+        JythonScript.execute(new URL("http://test"));
+    }
+
+    @Test(expected = JythonScriptException.class)
+    public void testExecute_urlNotFound() throws Exception {
+        JythonScript.execute(new URL("file:///test/test"));
     }
 
     @Test
@@ -486,31 +510,31 @@ public class JythonScriptTest {
     @Test
     public void testEvaluate_inputStreamEmpty() {
         try {
-            JythonScript.execute(new FileInputStream(new File("")));
+            JythonScript.evaluate(new FileInputStream(new File("")));
         } catch (Exception e) {
             // This is expected
         }
 
         try {
-            JythonScript.execute(new FileInputStream(new File("    ")));
+            JythonScript.evaluate(new FileInputStream(new File("    ")));
         } catch (Exception e) {
             // This is expected
         }
 
         try {
-            JythonScript.execute(new FileInputStream(new File("\n")));
+            JythonScript.evaluate(new FileInputStream(new File("\n")));
         } catch (Exception e) {
             // This is expected
         }
 
         try {
-            JythonScript.execute(new FileInputStream(new File("\t")));
+            JythonScript.evaluate(new FileInputStream(new File("\t")));
         } catch (Exception e) {
             // This is expected
         }
 
         try {
-            JythonScript.execute(new FileInputStream(new File("\r")));
+            JythonScript.evaluate(new FileInputStream(new File("\r")));
         } catch (Exception e) {
             // This is expected
         }
@@ -602,6 +626,11 @@ public class JythonScriptTest {
         JythonScript.evaluate((PyCode) null);
     }
 
+    @Test(expected = JythonScriptException.class)
+    public void testEvaluate_pycodeEmpty() throws JythonScriptException {
+        JythonScript.evaluate(new TestPyCode());
+    }
+
     @Test
     public void testEvaluate_pycodeNoResult() {
         try {
@@ -641,6 +670,11 @@ public class JythonScriptTest {
     @Test(expected = JythonScriptException.class)
     public void testExecute_pycodeNull() throws JythonScriptException {
         JythonScript.execute((PyCode) null);
+    }
+
+    @Test(expected = JythonScriptException.class)
+    public void testExecute_pycodeEmpty() throws JythonScriptException {
+        JythonScript.execute(new TestPyCode());
     }
 
     @Test
@@ -896,6 +930,26 @@ public class JythonScriptTest {
         assertTrue(Modifier.isPrivate(constructor.getModifiers()));
         constructor.setAccessible(true);
         constructor.newInstance();
+    }
+
+    /**
+     * Test implementation of a {@link PyCode} instance. This specific instance is used to cause errors to be thrown
+     * by the Jython exec function.
+     *
+     * @author Adam Childs
+     * @since 2.0
+     */
+    private class TestPyCode extends PyBaseCode {
+
+        private TestPyCode() {
+            co_freevars = new String[]{ "test", "throws exception", "when this array has contents" };
+        }
+
+        @Override
+        protected PyObject interpret(PyFrame pyFrame, ThreadState threadState) {
+            return null;
+        }
+
     }
 
 }
