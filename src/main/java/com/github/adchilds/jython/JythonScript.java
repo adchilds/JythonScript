@@ -160,7 +160,7 @@ public class JythonScript {
     /**
      * Compiles the given Jython script into a {@link PyCode} object.
      *
-     * @param script the Jython script to compile
+     * @param script the Jython script to compile (this should be actual Jython code represented as a {@link String})
      * @return a compiled Jython script
      * @throws JythonScriptException when the given script is null or empty
      * @since 2.0

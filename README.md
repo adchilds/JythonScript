@@ -75,6 +75,30 @@ required.
 	
   Output: "Result = [25]"
 
+
+  Test3.java
+  
+    import com.github.adchilds.jython.JythonScript;
+    	
+    public class Test2 {
+    	
+    	public static void main(String[] args) {
+    		String script = "from java.lang import System\n" +
+                            "\t\n" +
+                            "\tdef test():\n" +
+                            "\t\tSystem.out.println('Hello from Jython')\n" +
+                            "\t\n" +
+                            "\tif __name__ == '__main__':\n" +
+                            "\t\ttest()";
+    		
+    		PyCode compiledScript = JythonScript.compileString(script);
+    		JythonScript.execute(compiledScript);
+    	}
+    }
+
+  Output: "Hello from Jython"
+
+
 ## Useful Links:
 * JythonScript - https://github.com/adchilds/JythonScript
 * Python - https://www.python.org
