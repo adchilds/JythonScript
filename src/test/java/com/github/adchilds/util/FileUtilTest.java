@@ -14,7 +14,7 @@ import static org.junit.Assert.*;
  * Tests for the {@link FileUtil} class.
  *
  * @author Adam Childs
- * @since 0.2
+ * @since 1.1
  */
 public class FileUtilTest {
 
@@ -24,22 +24,25 @@ public class FileUtilTest {
     private static final String CONTENTS_OF_FILE_WITH_CONTENT_UNIX = "This is a test text file with\n\n\nmultiple\n\nlines.";
 
     @Test
-    public void testGetFileInputStream_string() {
-        // Null
+    public void testGetFileInputStream_stringNull() {
         try {
             FileUtil.getFileInputStream((String) null);
         } catch (IOException e) {
             // This is expected
         }
+    }
 
-        // Empty
+    @Test
+    public void testGetFileInputStream_stringEmpty() {
         try {
             FileUtil.getFileInputStream("");
         } catch (IOException e) {
             // This is expected
         }
+    }
 
-        // Invalid
+    @Test
+    public void testGetFileInputStream_stringInvalid() {
         try {
             FileUtil.getFileInputStream("    ");
         } catch (IOException e) {
@@ -51,8 +54,10 @@ public class FileUtilTest {
         } catch (IOException e) {
             // This is expected
         }
+    }
 
-        // Valid
+    @Test
+    public void testGetFileInputStream_stringValid() {
         String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testEvaluate.py").getPath();
         try {
             FileUtil.getFileInputStream(filePath);
@@ -63,15 +68,16 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testGetFileInputStream_file() {
-        // Null
+    public void testGetFileInputStream_fileNull() {
         try {
             FileUtil.getFileInputStream((File) null);
         } catch (IOException e) {
             // This is expected
         }
+    }
 
-        // Invalid
+    @Test
+    public void testGetFileInputStream_fileInvalid() {
         String dirPath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH).getPath();
         try {
             FileUtil.getFileInputStream(new File(dirPath));
@@ -84,8 +90,10 @@ public class FileUtilTest {
         } catch (IOException e) {
             // This is expected
         }
+    }
 
-        // Valid
+    @Test
+    public void testGetFileInputStream_fileValid() {
         String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testEvaluate.py").getPath();
         try {
             FileUtil.getFileInputStream(new File(filePath));
@@ -96,31 +104,36 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testReadFully_file() {
-        // Null
+    public void testReadFully_fileNull() {
         try {
             assertEquals("", FileUtil.readFully(null));
         } catch (IOException e) {
             fail("Unexpected error occurred.");
         }
+    }
 
-        // Empty
+    @Test
+    public void testReadFully_fileEmpty() {
         File file = new File(ClassLoader.getSystemResource(TEST_RESOURCE_BASE_PATH + "test_empty.txt").getPath());
         try {
             assertEquals("", FileUtil.readFully(file));
         } catch (IOException e) {
             fail("Unexpected error occurred.");
         }
+    }
 
-        // Invalid
+    @Test
+    public void testReadFully_fileInvalid() {
         try {
             FileUtil.readFully(new File("/Users/test.py"));
         } catch (IOException e) {
             // This is expected
         }
+    }
 
-        // Valid
-        file = new File(ClassLoader.getSystemResource(TEST_RESOURCE_BASE_PATH + "test_content.txt").getPath());
+    @Test
+    public void testReadFully_fileValid() {
+        File file = new File(ClassLoader.getSystemResource(TEST_RESOURCE_BASE_PATH + "test_content.txt").getPath());
         try {
             String fileContents = FileUtil.readFully(file);
 

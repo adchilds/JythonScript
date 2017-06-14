@@ -7,7 +7,7 @@ import org.junit.Test;
  * Tests for the {@link JythonScriptNotFoundException} class.
  *
  * @author Adam Childs
- * @since 0.1
+ * @since 1.0
  */
 public class JythonScriptNotFoundExceptionTest {
 

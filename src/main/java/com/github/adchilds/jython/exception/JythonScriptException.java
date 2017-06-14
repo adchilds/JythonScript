@@ -5,7 +5,7 @@ package com.github.adchilds.jython.exception;
  * execution or evaluation.
  *
  * @author Adam Childs
- * @since 0.1
+ * @since 1.0
  */
 public class JythonScriptException extends Exception {
 

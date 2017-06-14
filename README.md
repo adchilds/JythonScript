@@ -1,6 +1,6 @@
-# JythonScript v1.0
+# JythonScript v2.0
 
-[![Build Status](https://travis-ci.org/adchilds/JythonScript.svg?branch=develop)](https://travis-ci.org/adchilds/JythonScript) [![Coverage Status](https://coveralls.io/repos/github/adchilds/JythonScript/badge.svg?branch=develop)](https://coveralls.io/github/adchilds/JythonScript?branch=develop)
+[![Build Status](https://travis-ci.org/adchilds/JythonScript.svg?branch=develop)](https://travis-ci.org/adchilds/JythonScript) [![Coverage Status](https://coveralls.io/repos/github/adchilds/JythonScript/badge.svg?branch=develop)](https://coveralls.io/github/adchilds/JythonScript?branch=develop) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.adchilds/jythonscript/badge.svg)](http://search.maven.org/#artifactdetails%7Ccom.github.adchilds%7Cjythonscript%7C1.0%7C)
 
 ## Description:
 JythonScript is a simple Jython wrapper for easier execution and/or evaluation of Python expressions and scripts at 
@@ -11,7 +11,7 @@ runtime for JVM-based languages.
     <dependency>
       <groupId>com.github.adchilds</groupId>
       <artifactId>jythonscript</artifactId>
-      <version>1.0</version>
+      <version>2.0</version>
     </dependency>
 
 ## Dependencies:
@@ -74,6 +74,30 @@ required.
 	}
 	
   Output: "Result = [25]"
+
+
+  Test3.java
+  
+    import com.github.adchilds.jython.JythonScript;
+    	
+    public class Test2 {
+    	
+    	public static void main(String[] args) {
+    		String script = "from java.lang import System\n" +
+                            "\t\n" +
+                            "\tdef test():\n" +
+                            "\t\tSystem.out.println('Hello from Jython')\n" +
+                            "\t\n" +
+                            "\tif __name__ == '__main__':\n" +
+                            "\t\ttest()";
+    		
+    		PyCode compiledScript = JythonScript.compileString(script);
+    		JythonScript.execute(compiledScript);
+    	}
+    }
+
+  Output: "Hello from Jython"
+
 
 ## Useful Links:
 * JythonScript - https://github.com/adchilds/JythonScript

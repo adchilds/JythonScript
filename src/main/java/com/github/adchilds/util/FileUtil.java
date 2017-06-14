@@ -6,7 +6,7 @@ import java.io.*;
  * Provides static file operations, such as converting a {@link String} or {@link File} to an {@link InputStream}.
  *
  * @author Adam Childs
- * @since 0.1
+ * @since 1.0
  */
 public class FileUtil {
 
@@ -23,6 +23,7 @@ public class FileUtil {
      * @param object the object to convert to an input stream
      * @return a new {@link InputStream} created from the given {@code object}
      * @throws IOException when the given Object cannot be converted to a FileInputStream
+     * @since 1.0
      */
     public static InputStream getFileInputStream(Object object) throws IOException {
         if (object instanceof String) {
@@ -40,6 +41,7 @@ public class FileUtil {
      * @param file the {@link File} to read the contents of
      * @return a new {@link String} that contains the contents of the given file
      * @throws IOException when the given File cannot be found or read from
+     * @since 1.0
      */
     public static String readFully(File file) throws IOException {
         if (file == null) {
@@ -56,6 +58,7 @@ public class FileUtil {
      * @param encoding the character encoding that the resulting {@link String} should be (i.e. UTF-8)
      * @return a new {@link String} that contains the contents of the given stream
      * @throws IOException when the given InputStream cannot be read from
+     * @since 1.0
      */
     public static String readFully(InputStream inputStream, String encoding) throws IOException {
         return new String(readFully(inputStream), encoding);
@@ -67,6 +70,7 @@ public class FileUtil {
      * @param inputStream the {@link InputStream} to read the contents of
      * @return a new array of bytes that contains the contents of the given stream
      * @throws IOException when the given InputStream cannot be read from
+     * @since 1.0
      */
     private static byte[] readFully(InputStream inputStream) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

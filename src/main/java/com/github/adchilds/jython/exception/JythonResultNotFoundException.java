@@ -5,7 +5,7 @@ package com.github.adchilds.jython.exception;
  * variable named 'result' in order to correctly pass information back to Java.
  *
  * @author Adam Childs
- * @since 0.1
+ * @since 1.0
  */
 public class JythonResultNotFoundException extends JythonScriptException {
 

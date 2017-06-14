@@ -12,39 +12,56 @@ import static org.junit.Assert.*;
  * Tests for the {@link StringUtil} class.
  *
  * @author Adam Childs
- * @since 0.2
+ * @since 1.1
  */
 public class StringUtilTest {
 
     @Test
-    public void testIsBlank() {
-        // Null
+    public void testIsBlank_null() {
         assertTrue(StringUtil.isBlank(null));
+    }
 
-        // Empty
+    @Test
+    public void testIsBlank_empty() {
         assertTrue(StringUtil.isBlank(""));
+    }
 
-        // Whitespace
+    @Test
+    public void testIsBlank_whitespace() {
         assertTrue(StringUtil.isBlank("    "));
+        assertTrue(StringUtil.isBlank("\t"));
+        assertTrue(StringUtil.isBlank("\r"));
+        assertTrue(StringUtil.isBlank("\n"));
+    }
 
-        // Valid
+    @Test
+    public void testIsBlank_invalid() {
         assertFalse(StringUtil.isBlank("Test"));
         assertFalse(StringUtil.isBlank("1234"));
         assertFalse(StringUtil.isBlank("!@#$"));
     }
 
     @Test
-    public void testIsNotBlank() {
-        // Null
+    public void testIsNotBlank_null() {
         assertFalse(StringUtil.isNotBlank(null));
+    }
 
-        // Empty
+    @Test
+    public void testIsNotBlank_empty() {
         assertFalse(StringUtil.isNotBlank(""));
 
-        // Whitespace
-        assertFalse(StringUtil.isNotBlank("    "));
+    }
 
-        // Valid
+    @Test
+    public void testIsNotBlank_whitespace() {
+        assertFalse(StringUtil.isNotBlank("    "));
+        assertFalse(StringUtil.isNotBlank("\t"));
+        assertFalse(StringUtil.isNotBlank("\r"));
+        assertFalse(StringUtil.isNotBlank("\n"));
+    }
+
+    @Test
+    public void testIsNotBlank_valid() {
         assertTrue(StringUtil.isNotBlank("Test"));
         assertTrue(StringUtil.isNotBlank("1234"));
         assertTrue(StringUtil.isNotBlank("!@#$"));

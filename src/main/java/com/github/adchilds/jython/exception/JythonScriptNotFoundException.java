@@ -8,7 +8,7 @@ import java.io.InputStream;
  * located on the host system.
  *
  * @author Adam Childs
- * @since 0.1
+ * @since 1.0
  */
 public class JythonScriptNotFoundException extends JythonScriptException {
 
