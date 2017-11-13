@@ -11,7 +11,6 @@ import org.python.util.PythonInterpreter;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -83,8 +82,6 @@ import java.util.Set;
  * @since 1.0
  */
 public class JythonScript {
-
-    private static PythonInterpreter INTERPRETER = new PythonInterpreter();
 
     private static final String EVALUATION_RESULT_LOCAL_VARIABLE = "result";
 
@@ -170,8 +167,10 @@ public class JythonScript {
             throw new JythonScriptException("Given script was null or empty; cannot be compiled into PyCode.");
         }
 
+        PythonInterpreter interpreter = new PythonInterpreter();
+
         // Compile the script, returning the associated PyCode object
-        return INTERPRETER.compile(script);
+        return interpreter.compile(script);
     }
 
     /**
@@ -281,10 +280,10 @@ public class JythonScript {
      */
     public static Object evaluate(InputStream inputStream, Object... args) throws JythonScriptException {
         // Execute the script
-        execute(inputStream, args);
+        PythonInterpreter interpreter = executeWithState(inputStream, args);
 
         // Obtain the value of a local variable named 'result' from the executed script
-        PyObject result = INTERPRETER.get(EVALUATION_RESULT_LOCAL_VARIABLE);
+        PyObject result = interpreter.get(EVALUATION_RESULT_LOCAL_VARIABLE);
 
         if (result == null) {
             throw new JythonResultNotFoundException("Local variable 'result' not found during script execution.");
@@ -306,10 +305,10 @@ public class JythonScript {
      */
     public static Object evaluate(PyCode pyCode, Object... args) throws JythonScriptException {
         // Execute the script
-        execute(pyCode, args);
+        PythonInterpreter interpreter = executeWithState(pyCode, args);
 
         // Obtain the value of a local variable named 'result' from the executed script
-        PyObject result = INTERPRETER.get(EVALUATION_RESULT_LOCAL_VARIABLE);
+        PyObject result = interpreter.get(EVALUATION_RESULT_LOCAL_VARIABLE);
 
         if (result == null) {
             throw new JythonResultNotFoundException("Local variable 'result' not found during script execution.");
@@ -424,11 +423,11 @@ public class JythonScript {
         }
 
         // Set the arguments on the Python System State
-        updateInterpreterState(args);
+        PythonInterpreter interpreter = updateInterpreterState(args);
 
         try {
             // Execute the script
-            INTERPRETER.execfile(inputStream);
+            interpreter.execfile(inputStream);
         } catch (Exception e) {
             throw new JythonScriptException("An error occurred during script execution. cause=[\n\t" + e.toString() + "]");
         }
@@ -450,14 +449,74 @@ public class JythonScript {
         }
 
         // Set the arguments on the Python System State
-        updateInterpreterState(args);
+        PythonInterpreter interpreter = updateInterpreterState(args);
 
         try {
             // Execute the script
-            INTERPRETER.exec(pyCode);
+            interpreter.exec(pyCode);
         } catch (Exception e) {
             throw new JythonScriptException("An error occurred during script execution. cause=[\n\t" + e.toString() + "]");
         }
+    }
+
+    /**
+     * Executes the given Jython script with optional arguments passed to the script at runtime. {@code args} should be
+     * interpreted as 'sys.argv' arguments in the given script. Note that the arguments passed in here will begin at
+     * the first index in a Jython scripts sys.argv list.
+     *
+     * This function returns the {@link PythonInterpreter} state after executing the given Jython code.
+     *
+     * @param inputStream the {@link InputStream} that represents the Jython script to be executed
+     * @param args arguments to be passed to the script
+     * @throws JythonScriptException when the given inputstream is null or a script execution error occurs
+     * @since 2.0.1
+     */
+    private static PythonInterpreter executeWithState(InputStream inputStream, Object... args) throws JythonScriptException {
+        if (inputStream == null) {
+            throw new JythonScriptException("Cannot execute a Jython script that doesn't exist! InputStream is null.");
+        }
+
+        // Set the arguments on the Python System State
+        PythonInterpreter interpreter = updateInterpreterState(args);
+
+        try {
+            // Execute the script
+            interpreter.execfile(inputStream);
+        } catch (Exception e) {
+            throw new JythonScriptException("An error occurred during script execution. cause=[\n\t" + e.toString() + "]");
+        }
+
+        return interpreter;
+    }
+
+    /**
+     * Executes the given Jython script with optional arguments passed to the script at runtime. {@code args} should be
+     * interpreted as 'sys.argv' arguments in the given script. Note that the arguments passed in here will begin at
+     * the first index in a Jython scripts sys.argv list.
+     *
+     * This function returns the {@link PythonInterpreter} state after executing the given Jython code.
+     *
+     * @param pyCode the compiled Jython script to evaluate
+     * @param args arguments to be passed to the script
+     * @throws JythonScriptException when the given PyCode is null or a script execution error occurs
+     * @since 2.0.1
+     */
+    private static PythonInterpreter executeWithState(PyCode pyCode, Object... args) throws JythonScriptException {
+        if (pyCode == null) {
+            throw new JythonScriptException("Cannot execute a Jython script that doesn't exist! InputStream is null.");
+        }
+
+        // Set the arguments on the Python System State
+        PythonInterpreter interpreter = updateInterpreterState(args);
+
+        try {
+            // Execute the script
+            interpreter.exec(pyCode);
+        } catch (Exception e) {
+            throw new JythonScriptException("An error occurred during script execution. cause=[\n\t" + e.toString() + "]");
+        }
+
+        return interpreter;
     }
 
     /**
@@ -466,13 +525,14 @@ public class JythonScript {
      * sys.argv[1]). Note: the first index is reserved.
      *
      * @param args the arguments to set on the {@link PySystemState} for the current {@link PythonInterpreter}
+     * @since 1.0
      */
-    private static void updateInterpreterState(Object... args) {
+    private static PythonInterpreter updateInterpreterState(Object... args) {
         // Setup the Python System State by appending the given arguments
         PySystemState state = parseArguments(args);
 
         // Add the arguments to the PythonInterpreter
-        INTERPRETER = new PythonInterpreter(null, state);
+        return new PythonInterpreter(null, state);
     }
 
     /**
@@ -480,6 +540,7 @@ public class JythonScript {
      * value to the set of arguments to be passed to the executing script.
      *
      * @param args the arguments to parse before being sent to a Python script
+     * @since 1.0
      */
     private static PySystemState parseArguments(Object... args) {
         PySystemState systemState = new PySystemState();
@@ -509,6 +570,7 @@ public class JythonScript {
      *
      * @param object the object to convert to it's equivalent Java type, if supported; otherwise, returns the unconverted {@link PyObject}
      * @return the Java type representation of the given {@link PyObject}
+     * @since 1.0
      */
     private static Object parseResult(PyObject object) {
         if (object == null) {
@@ -542,6 +604,7 @@ public class JythonScript {
      *
      * @param pyObjects an array of {@link PyObject}s to parse
      * @return a new array of {@link Object}s
+     * @since 1.0
      */
     private static Object[] parsePyObjectList(PyObject[] pyObjects) {
         Object[] objects = new Object[pyObjects.length];
@@ -580,6 +643,7 @@ public class JythonScript {
      *
      * @param pySet the set to parse
      * @return a new {@link Set} of {@link Object}s
+     * @since 1.0
      */
     private static Set<Object> parsePyObjectSet(Set<PyObject> pySet) {
         Set<Object> objects = new HashSet<>();
