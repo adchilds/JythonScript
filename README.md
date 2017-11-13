@@ -1,4 +1,4 @@
-# JythonScript v2.0
+# JythonScript v2.0.x
 
 [![Build Status](https://travis-ci.org/adchilds/JythonScript.svg?branch=develop)](https://travis-ci.org/adchilds/JythonScript) [![Coverage Status](https://coveralls.io/repos/github/adchilds/JythonScript/badge.svg?branch=develop)](https://coveralls.io/github/adchilds/JythonScript?branch=develop) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.adchilds/jythonscript/badge.svg)](http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22jythonscript%22)
 
@@ -11,7 +11,7 @@ runtime for JVM-based languages.
     <dependency>
       <groupId>com.github.adchilds</groupId>
       <artifactId>jythonscript</artifactId>
-      <version>2.0</version>
+      <version>2.0.1</version>
     </dependency>
 
 ## Dependencies:
