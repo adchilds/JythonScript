@@ -1,7 +1,9 @@
 package com.github.adchilds.jython.exception;
 
 import com.github.adchilds.jython.JythonScript;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests for the {@link JythonScriptNotFoundException} class.
@@ -9,31 +11,49 @@ import org.junit.Test;
  * @author Adam Childs
  * @since 1.0
  */
-public class JythonScriptNotFoundExceptionTest {
+class JythonScriptNotFoundExceptionTest {
 
-    @Test(expected = JythonScriptNotFoundException.class)
-    public void testJythonScriptNotFoundException_invalidFile() throws JythonScriptException {
-        JythonScript.evaluate("invalidFile.py");
+    private final String EXCEPTION_MESSAGE = "An exception was thrown.";
+
+    @Test
+    void testJythonScriptNotFoundException_invalidFile() {
+        assertThrows(JythonScriptNotFoundException.class, () -> JythonScript.evaluate("invalidFile.py"));
     }
 
-    @Test(expected = JythonScriptNotFoundException.class)
-    public void testJythonScriptNotFoundException() throws JythonScriptException {
-        throw new JythonScriptNotFoundException();
+    @Test
+    void testJythonScriptNotFoundException() {
+        assertThrows(JythonScriptNotFoundException.class, () -> {
+            throw new JythonScriptNotFoundException();
+        });
     }
 
-    @Test(expected = JythonScriptNotFoundException.class)
-    public void testJythonScriptNotFoundException_message() throws JythonScriptException {
-        throw new JythonScriptNotFoundException("Test.");
+    @Test
+    void testJythonScriptNotFoundException_message() {
+        final Throwable exception = assertThrows(JythonScriptNotFoundException.class, () -> {
+            throw new JythonScriptNotFoundException(EXCEPTION_MESSAGE);
+        });
+
+        assertEquals(EXCEPTION_MESSAGE, exception.getMessage());
+        assertNull(exception.getCause());
     }
 
-    @Test(expected = JythonScriptNotFoundException.class)
-    public void testJythonScriptNotFoundException_messageCause() throws JythonScriptException {
-        throw new JythonScriptNotFoundException("Test.", new RuntimeException());
+    @Test
+    void testJythonScriptNotFoundException_messageCause() {
+        final Throwable exception = assertThrows(JythonScriptNotFoundException.class, () -> {
+            throw new JythonScriptNotFoundException(EXCEPTION_MESSAGE, new RuntimeException("Source"));
+        });
+
+        assertEquals(EXCEPTION_MESSAGE, exception.getMessage());
+        assertEquals(RuntimeException.class, exception.getCause().getClass());
     }
 
-    @Test(expected = JythonScriptNotFoundException.class)
-    public void testJythonScriptNotFoundException_cause() throws JythonScriptException {
-        throw new JythonScriptNotFoundException(new RuntimeException());
+    @Test
+    void testJythonScriptNotFoundException_cause() {
+        final Throwable exception = assertThrows(JythonScriptNotFoundException.class, () -> {
+            throw new JythonScriptNotFoundException(new RuntimeException("Source"));
+        });
+
+        assertEquals(RuntimeException.class, exception.getCause().getClass());
     }
 
 }

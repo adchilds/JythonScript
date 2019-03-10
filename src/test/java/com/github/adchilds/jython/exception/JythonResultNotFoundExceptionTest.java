@@ -2,7 +2,9 @@ package com.github.adchilds.jython.exception;
 
 import com.github.adchilds.jython.JythonScript;
 import com.github.adchilds.jython.JythonScriptTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests for the {@link JythonResultNotFoundException} class.
@@ -10,40 +12,60 @@ import org.junit.Test;
  * @author Adam Childs
  * @since 1.0
  */
-public class JythonResultNotFoundExceptionTest {
+class JythonResultNotFoundExceptionTest {
 
-    @Test(expected = JythonResultNotFoundException.class)
-    public void testJythonResultNotFoundException_resultNotFound() throws JythonScriptException {
-        String filePath = ClassLoader.getSystemResource(JythonScriptTest.JYTHON_SCRIPT_BASE_PATH + "testResultNotFound.py").getPath();
+    private final String EXCEPTION_MESSAGE = "An exception was thrown.";
 
-        JythonScript.evaluate(filePath);
+    @Test
+    void testJythonResultNotFoundException_resultNotFound() {
+        final String filePath =
+                ClassLoader.getSystemResource(JythonScriptTest.JYTHON_SCRIPT_BASE_PATH + "testResultNotFound.py").getPath();
+
+        assertThrows(JythonResultNotFoundException.class, () -> JythonScript.evaluate(filePath));
     }
 
-    @Test(expected = JythonResultNotFoundException.class)
-    public void testJythonResultNotFoundException_resultNotFoundMultiArgs() throws JythonScriptException {
-        String filePath = ClassLoader.getSystemResource(JythonScriptTest.JYTHON_SCRIPT_BASE_PATH + "testResultNotFound.py").getPath();
+    @Test
+    void testJythonResultNotFoundException_resultNotFoundMultiArgs() {
+        final String filePath =
+                ClassLoader.getSystemResource(JythonScriptTest.JYTHON_SCRIPT_BASE_PATH + "testResultNotFound.py").getPath();
 
-        JythonScript.evaluate(filePath, 0, 1, 2, 3, 4, 5);
+        assertThrows(JythonResultNotFoundException.class, () -> JythonScript.evaluate(filePath, 0, 1, 2, 3, 4, 5));
     }
 
-    @Test(expected = JythonResultNotFoundException.class)
-    public void testJythonResultNotFoundException() throws JythonScriptException {
-        throw new JythonResultNotFoundException();
+    @Test
+    void testJythonResultNotFoundException() {
+        assertThrows(JythonResultNotFoundException.class, () -> {
+            throw new JythonResultNotFoundException();
+        });
     }
 
-    @Test(expected = JythonResultNotFoundException.class)
-    public void testJythonResultNotFoundException_message() throws JythonScriptException {
-        throw new JythonResultNotFoundException("Test.");
+    @Test
+    void testJythonResultNotFoundException_message() {
+        final Throwable exception = assertThrows(JythonResultNotFoundException.class, () -> {
+            throw new JythonResultNotFoundException(EXCEPTION_MESSAGE);
+        });
+
+        assertEquals(EXCEPTION_MESSAGE, exception.getMessage());
+        assertNull(exception.getCause());
     }
 
-    @Test(expected = JythonResultNotFoundException.class)
-    public void testJythonResultNotFoundException_messageCause() throws JythonScriptException {
-        throw new JythonResultNotFoundException("Test.", new RuntimeException());
+    @Test
+    void testJythonResultNotFoundException_messageCause() {
+        final Throwable exception = assertThrows(JythonResultNotFoundException.class, () -> {
+            throw new JythonResultNotFoundException(EXCEPTION_MESSAGE, new RuntimeException("Source"));
+        });
+
+        assertEquals(EXCEPTION_MESSAGE, exception.getMessage());
+        assertEquals(RuntimeException.class, exception.getCause().getClass());
     }
 
-    @Test(expected = JythonResultNotFoundException.class)
-    public void testJythonResultNotFoundException_cause() throws JythonScriptException {
-        throw new JythonResultNotFoundException(new RuntimeException());
+    @Test
+    void testJythonResultNotFoundException_cause() {
+        final Throwable exception = assertThrows(JythonResultNotFoundException.class, () -> {
+            throw new JythonResultNotFoundException(new RuntimeException("Source"));
+        });
+
+        assertEquals(RuntimeException.class, exception.getCause().getClass());
     }
 
 }

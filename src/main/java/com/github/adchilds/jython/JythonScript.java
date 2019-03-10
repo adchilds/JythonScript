@@ -3,8 +3,8 @@ package com.github.adchilds.jython;
 import com.github.adchilds.jython.exception.JythonResultNotFoundException;
 import com.github.adchilds.jython.exception.JythonScriptException;
 import com.github.adchilds.jython.exception.JythonScriptNotFoundException;
-import com.github.adchilds.util.FileUtil;
-import com.github.adchilds.util.StringUtil;
+import com.github.adchilds.util.FileUtils;
+import com.github.adchilds.util.StringUtils;
 import org.python.core.*;
 import org.python.util.PythonInterpreter;
 
@@ -93,9 +93,9 @@ public class JythonScript {
      * @throws JythonScriptException when the given file path is empty or null
      * @since 1.0
      */
-    public static PyCode compile(String filePath) throws JythonScriptException {
+    public static PyCode compile(final String filePath) throws JythonScriptException {
         // Make sure the file path is is not null or empty
-        if (StringUtil.isBlank(filePath)) {
+        if (StringUtils.isBlank(filePath)) {
             throw new JythonScriptException("Null or empty path is not a file.");
         }
 
@@ -111,12 +111,12 @@ public class JythonScript {
      * @throws JythonScriptException when the given URL is empty, null, or not a valid path
      * @since 2.0
      */
-    public static PyCode compile(URL fileUrl) throws JythonScriptException {
+    public static PyCode compile(final URL fileUrl) throws JythonScriptException {
         if (fileUrl == null) {
             throw new JythonScriptException("Null path is not a URL.");
         }
 
-        File file;
+        final File file;
         try {
             file = new File(fileUrl.toURI());
         } catch (Exception e) {
@@ -134,7 +134,7 @@ public class JythonScript {
      * @throws JythonScriptException when the given file is null or is not a file (i.e. a directory)
      * @since 1.0
      */
-    public static PyCode compile(File file) throws JythonScriptException {
+    public static PyCode compile(final File file) throws JythonScriptException {
         if (file == null) {
             throw new JythonScriptException("Given file is null; cannot be compiled into PyCode.");
         }
@@ -147,7 +147,7 @@ public class JythonScript {
 
         // Compile the file, returning the associated PyCode object
         try {
-            return compileString(FileUtil.readFully(file));
+            return compileString(FileUtils.readFully(file));
         } catch (IOException e) {
             throw new JythonScriptException("Could not compile the given file. file=[" +
                     file.getAbsolutePath() + "]", e);
@@ -162,12 +162,12 @@ public class JythonScript {
      * @throws JythonScriptException when the given script is null or empty
      * @since 2.0
      */
-    public static PyCode compileString(String script) throws JythonScriptException {
-        if (StringUtil.isBlank(script)) {
+    public static PyCode compileString(final String script) throws JythonScriptException {
+        if (StringUtils.isBlank(script)) {
             throw new JythonScriptException("Given script was null or empty; cannot be compiled into PyCode.");
         }
 
-        PythonInterpreter interpreter = new PythonInterpreter();
+        final PythonInterpreter interpreter = new PythonInterpreter();
 
         // Compile the script, returning the associated PyCode object
         return interpreter.compile(script);
@@ -185,16 +185,16 @@ public class JythonScript {
      * @throws JythonScriptException when the given file path is null, a directory, or cannot be found
      * @since 1.0
      */
-    public static Object evaluate(String scriptPath, Object... args) throws JythonScriptException {
+    public static Object evaluate(final String scriptPath, final Object... args) throws JythonScriptException {
         // Ensure that the scriptRelativePath is not null or empty
-        if (StringUtil.isBlank(scriptPath)) {
+        if (StringUtils.isBlank(scriptPath)) {
             throw new JythonScriptNotFoundException("File not found at path=[" + scriptPath + "]");
         }
 
         // Open an InputStream for the file
-        InputStream inputStream;
+        final InputStream inputStream;
         try {
-            inputStream = FileUtil.getFileInputStream(scriptPath);
+            inputStream = FileUtils.getFileInputStream(scriptPath);
         } catch (Exception e) {
             throw new JythonScriptNotFoundException("Could not open Jython script from location=[" + scriptPath + "]", e);
         }
@@ -214,13 +214,13 @@ public class JythonScript {
      * @throws JythonScriptException when the given script is null, a directory, or cannot be found
      * @since 2.0
      */
-    public static Object evaluate(URL scriptUrl, Object... args) throws JythonScriptException {
+    public static Object evaluate(final URL scriptUrl, final Object... args) throws JythonScriptException {
         if (scriptUrl == null) {
             throw new JythonScriptException("Null path is not a URL.");
         }
 
         // Convert the URL to a File
-        File file;
+        final File file;
         try {
             file = new File(scriptUrl.toURI());
         } catch (Exception e) {
@@ -228,9 +228,9 @@ public class JythonScript {
         }
 
         // Open an InputStream for the file
-        InputStream inputStream;
+        final InputStream inputStream;
         try {
-            inputStream = FileUtil.getFileInputStream(file);
+            inputStream = FileUtils.getFileInputStream(file);
         } catch (Exception e) {
             throw new JythonScriptNotFoundException("Could not open Jython script from location=[" + scriptUrl.getPath() + "]", e);
         }
@@ -249,16 +249,16 @@ public class JythonScript {
      * @throws JythonScriptException when the given file is null, a directory, or cannot be found
      * @since 1.0
      */
-    public static Object evaluate(File scriptFile, Object... args) throws JythonScriptException {
+    public static Object evaluate(final File scriptFile, final Object... args) throws JythonScriptException {
         // Ensure that the script is not null
         if (scriptFile == null) {
             throw new JythonScriptNotFoundException("Could not open Jython script, the file was null.");
         }
 
         // Open an InputStream for the file
-        InputStream inputStream;
+        final InputStream inputStream;
         try {
-            inputStream = FileUtil.getFileInputStream(scriptFile);
+            inputStream = FileUtils.getFileInputStream(scriptFile);
         } catch (Exception e) {
             throw new JythonScriptNotFoundException("Could not open Jython script from location=[" + scriptFile.getAbsolutePath() + "]", e);
         }
@@ -278,12 +278,12 @@ public class JythonScript {
      * @throws JythonScriptException when a script execution error occurs or when a local Python variable named 'result' is not found
      * @since 1.0
      */
-    public static Object evaluate(InputStream inputStream, Object... args) throws JythonScriptException {
+    public static Object evaluate(final InputStream inputStream, final Object... args) throws JythonScriptException {
         // Execute the script
-        PythonInterpreter interpreter = executeWithState(inputStream, args);
+        final PythonInterpreter interpreter = executeWithState(inputStream, args);
 
         // Obtain the value of a local variable named 'result' from the executed script
-        PyObject result = interpreter.get(EVALUATION_RESULT_LOCAL_VARIABLE);
+        final PyObject result = interpreter.get(EVALUATION_RESULT_LOCAL_VARIABLE);
 
         if (result == null) {
             throw new JythonResultNotFoundException("Local variable 'result' not found during script execution.");
@@ -303,12 +303,12 @@ public class JythonScript {
      * @throws JythonScriptException when a script execution error occurs or when a local Python variable named 'result' is not found
      * @since 1.0
      */
-    public static Object evaluate(PyCode pyCode, Object... args) throws JythonScriptException {
+    public static Object evaluate(final PyCode pyCode, final Object... args) throws JythonScriptException {
         // Execute the script
-        PythonInterpreter interpreter = executeWithState(pyCode, args);
+        final PythonInterpreter interpreter = executeWithState(pyCode, args);
 
         // Obtain the value of a local variable named 'result' from the executed script
-        PyObject result = interpreter.get(EVALUATION_RESULT_LOCAL_VARIABLE);
+        final PyObject result = interpreter.get(EVALUATION_RESULT_LOCAL_VARIABLE);
 
         if (result == null) {
             throw new JythonResultNotFoundException("Local variable 'result' not found during script execution.");
@@ -327,16 +327,16 @@ public class JythonScript {
      * @throws JythonScriptException when the given file path is null, a directory, or cannot be found
      * @since 1.0
      */
-    public static void execute(String scriptPath, Object... args) throws JythonScriptException {
+    public static void execute(final String scriptPath, final Object... args) throws JythonScriptException {
         // Ensure that the scriptRelativePath is not null or empty
-        if (StringUtil.isBlank(scriptPath)) {
+        if (StringUtils.isBlank(scriptPath)) {
             throw new JythonScriptNotFoundException("File not found at path=[" + scriptPath + "]");
         }
 
         // Open an InputStream for the file
-        InputStream inputStream;
+        final InputStream inputStream;
         try {
-            inputStream = FileUtil.getFileInputStream(scriptPath);
+            inputStream = FileUtils.getFileInputStream(scriptPath);
         } catch (Exception e) {
             throw new JythonScriptNotFoundException("Could not open Jython script from location=[" + scriptPath + "]", e);
         }
@@ -355,13 +355,13 @@ public class JythonScript {
      * @throws JythonScriptException when the given file is null, a directory, or cannot be found
      * @since 2.0
      */
-    public static void execute(URL scriptUrl, Object... args) throws JythonScriptException {
+    public static void execute(final URL scriptUrl, final Object... args) throws JythonScriptException {
         if (scriptUrl == null) {
             throw new JythonScriptException("Null path is not a URL.");
         }
 
         // Convert the URL to a File
-        File file;
+        final File file;
         try {
             file = new File(scriptUrl.toURI());
         } catch (Exception e) {
@@ -369,9 +369,9 @@ public class JythonScript {
         }
 
         // Open an InputStream for the file
-        InputStream inputStream;
+        final InputStream inputStream;
         try {
-            inputStream = FileUtil.getFileInputStream(file);
+            inputStream = FileUtils.getFileInputStream(file);
         } catch (Exception e) {
             throw new JythonScriptNotFoundException("Could not open Jython script from location=[" + scriptUrl.getPath() + "]", e);
         }
@@ -389,16 +389,16 @@ public class JythonScript {
      * @throws JythonScriptException when the given file is null, a directory, or cannot be found
      * @since 1.0
      */
-    public static void execute(File scriptFile, Object... args) throws JythonScriptException {
+    public static void execute(final File scriptFile, final Object... args) throws JythonScriptException {
         // Ensure that the script is not null
         if (scriptFile == null) {
             throw new JythonScriptNotFoundException("Could not open Jython script, the file was null.");
         }
 
         // Open an InputStream for the file
-        InputStream inputStream;
+        final InputStream inputStream;
         try {
-            inputStream = FileUtil.getFileInputStream(scriptFile);
+            inputStream = FileUtils.getFileInputStream(scriptFile);
         } catch (Exception e) {
             throw new JythonScriptNotFoundException("Could not open Jython script from location=[" + scriptFile.getAbsolutePath() + "]", e);
         }
@@ -417,13 +417,13 @@ public class JythonScript {
      * @throws JythonScriptException when the given inputstream is null or a script execution error occurs
      * @since 1.0
      */
-    public static void execute(InputStream inputStream, Object... args) throws JythonScriptException {
+    public static void execute(final InputStream inputStream, final Object... args) throws JythonScriptException {
         if (inputStream == null) {
             throw new JythonScriptException("Cannot execute a Jython script that doesn't exist! InputStream is null.");
         }
 
         // Set the arguments on the Python System State
-        PythonInterpreter interpreter = updateInterpreterState(args);
+        final PythonInterpreter interpreter = updateInterpreterState(args);
 
         try {
             // Execute the script
@@ -443,13 +443,13 @@ public class JythonScript {
      * @throws JythonScriptException when the given PyCode is null or a script execution error occurs
      * @since 1.0
      */
-    public static void execute(PyCode pyCode, Object... args) throws JythonScriptException {
+    public static void execute(final PyCode pyCode, final Object... args) throws JythonScriptException {
         if (pyCode == null) {
             throw new JythonScriptException("Cannot execute a Jython script that doesn't exist! InputStream is null.");
         }
 
         // Set the arguments on the Python System State
-        PythonInterpreter interpreter = updateInterpreterState(args);
+        final PythonInterpreter interpreter = updateInterpreterState(args);
 
         try {
             // Execute the script
@@ -471,13 +471,13 @@ public class JythonScript {
      * @throws JythonScriptException when the given inputstream is null or a script execution error occurs
      * @since 2.0.1
      */
-    private static PythonInterpreter executeWithState(InputStream inputStream, Object... args) throws JythonScriptException {
+    private static PythonInterpreter executeWithState(final InputStream inputStream, final Object... args) throws JythonScriptException {
         if (inputStream == null) {
             throw new JythonScriptException("Cannot execute a Jython script that doesn't exist! InputStream is null.");
         }
 
         // Set the arguments on the Python System State
-        PythonInterpreter interpreter = updateInterpreterState(args);
+        final PythonInterpreter interpreter = updateInterpreterState(args);
 
         try {
             // Execute the script
@@ -501,13 +501,13 @@ public class JythonScript {
      * @throws JythonScriptException when the given PyCode is null or a script execution error occurs
      * @since 2.0.1
      */
-    private static PythonInterpreter executeWithState(PyCode pyCode, Object... args) throws JythonScriptException {
+    private static PythonInterpreter executeWithState(final PyCode pyCode, final Object... args) throws JythonScriptException {
         if (pyCode == null) {
             throw new JythonScriptException("Cannot execute a Jython script that doesn't exist! InputStream is null.");
         }
 
         // Set the arguments on the Python System State
-        PythonInterpreter interpreter = updateInterpreterState(args);
+        final PythonInterpreter interpreter = updateInterpreterState(args);
 
         try {
             // Execute the script
@@ -527,9 +527,9 @@ public class JythonScript {
      * @param args the arguments to set on the {@link PySystemState} for the current {@link PythonInterpreter}
      * @since 1.0
      */
-    private static PythonInterpreter updateInterpreterState(Object... args) {
+    private static PythonInterpreter updateInterpreterState(final Object... args) {
         // Setup the Python System State by appending the given arguments
-        PySystemState state = parseArguments(args);
+        final PySystemState state = parseArguments(args);
 
         // Add the arguments to the PythonInterpreter
         return new PythonInterpreter(null, state);
@@ -542,10 +542,10 @@ public class JythonScript {
      * @param args the arguments to parse before being sent to a Python script
      * @since 1.0
      */
-    private static PySystemState parseArguments(Object... args) {
-        PySystemState systemState = new PySystemState();
+    private static PySystemState parseArguments(final Object... args) {
+        final PySystemState systemState = new PySystemState();
 
-        for (Object arg : args) {
+        for (final Object arg : args) {
             systemState.argv.append(Py.java2py(arg));
         }
 
@@ -572,7 +572,7 @@ public class JythonScript {
      * @return the Java type representation of the given {@link PyObject}
      * @since 1.0
      */
-    private static Object parseResult(PyObject object) {
+    private static Object parseResult(final PyObject object) {
         if (object == null) {
             // We should never get here since evaluate provides this check; but, just in case.
             return null;
@@ -606,11 +606,11 @@ public class JythonScript {
      * @return a new array of {@link Object}s
      * @since 1.0
      */
-    private static Object[] parsePyObjectList(PyObject[] pyObjects) {
-        Object[] objects = new Object[pyObjects.length];
+    private static Object[] parsePyObjectList(final PyObject[] pyObjects) {
+        final Object[] objects = new Object[pyObjects.length];
 
         int index = 0;
-        for (PyObject pyObject : pyObjects) {
+        for (final PyObject pyObject : pyObjects) {
             objects[index] = parseResult(pyObject);
 
             index++;
@@ -625,12 +625,12 @@ public class JythonScript {
      * @param pyDict the dictionary to parse
      * @return a new {@link Map} of {@link Object}s
      */
-    private static Map<Object, Object> parsePyObjectDict(Map<PyObject, PyObject> pyDict) {
-        Map<Object, Object> objects = new HashMap<>();
+    private static Map<Object, Object> parsePyObjectDict(final Map<PyObject, PyObject> pyDict) {
+        final Map<Object, Object> objects = new HashMap<>();
 
-        for (Map.Entry entry : pyDict.entrySet()) {
-            Object key = parseResult((PyObject) entry.getKey());
-            Object value = parseResult((PyObject) entry.getValue());
+        for (final Map.Entry entry : pyDict.entrySet()) {
+            final Object key = parseResult((PyObject) entry.getKey());
+            final Object value = parseResult((PyObject) entry.getValue());
 
             objects.put(key, value);
         }
@@ -645,10 +645,10 @@ public class JythonScript {
      * @return a new {@link Set} of {@link Object}s
      * @since 1.0
      */
-    private static Set<Object> parsePyObjectSet(Set<PyObject> pySet) {
-        Set<Object> objects = new HashSet<>();
+    private static Set<Object> parsePyObjectSet(final Set<PyObject> pySet) {
+        final Set<Object> objects = new HashSet<>();
 
-        for (PyObject pyObject : pySet) {
+        for (final PyObject pyObject : pySet) {
             objects.add(parseResult(pyObject));
         }
 

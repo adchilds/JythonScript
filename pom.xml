@@ -48,8 +48,9 @@
     </distributionManagement>
 
     <properties>
-        <jython.standalone.version>2.7.0</jython.standalone.version>
-        <junit.version>4.12</junit.version>
+        <jython.standalone.version>2.7.1</jython.standalone.version>
+        <junit.version>5.4.0</junit.version>
+        <junit.launcher.version>1.4.0</junit.launcher.version>
     </properties>
 
     <build>
@@ -174,9 +175,21 @@
 
         <!-- JUnit -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
             <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-launcher</artifactId>
+            <version>${junit.launcher.version}</version>
             <scope>test</scope>
         </dependency>
 

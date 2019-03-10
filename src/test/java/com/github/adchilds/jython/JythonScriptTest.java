@@ -2,11 +2,12 @@ package com.github.adchilds.jython;
 
 import com.github.adchilds.jython.exception.JythonResultNotFoundException;
 import com.github.adchilds.jython.exception.JythonScriptException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.python.core.*;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -15,7 +16,7 @@ import java.net.URL;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests for the {@link JythonScript} class.
@@ -25,160 +26,101 @@ import static org.junit.Assert.*;
  */
 public class JythonScriptTest {
 
+    private static final double DELTA = 1E15;
+
     public static final String JYTHON_SCRIPT_BASE_PATH = "script/jython/";
 
-    @Test(expected = JythonScriptException.class)
-    public void testCompile_filePathNull() throws JythonScriptException {
-        JythonScript.compile((String) null);
+
+    @Test
+    void testCompile_filePathNull() {
+        assertThrows(JythonScriptException.class, () -> JythonScript.compile((String) null));
     }
 
     @Test
-    public void testCompile_filePathEmpty() {
-        try {
-            JythonScript.compile("");
-        } catch (JythonScriptException e) {
-            // This is expected
-        }
-
-        try {
-            JythonScript.compile("    ");
-        } catch (JythonScriptException e) {
-            // This is expected
-        }
-
-        try {
-            JythonScript.compile("\n");
-        } catch (JythonScriptException e) {
-            // This is expected
-        }
-
-        try {
-            JythonScript.compile("\t");
-        } catch (JythonScriptException e) {
-            // This is expected
-        }
-
-        try {
-            JythonScript.compile("\r");
-        } catch (JythonScriptException e) {
-            // This is expected
-        }
-    }
-
-    @Test(expected = JythonScriptException.class)
-    public void testCompile_filePathInvalid() throws JythonScriptException {
-        JythonScript.compile("/Users/test/notfound.py");
+    void testCompile_filePathEmpty() {
+        assertThrows(JythonScriptException.class, () -> JythonScript.compile(""));
+        assertThrows(JythonScriptException.class, () -> JythonScript.compile("    "));
+        assertThrows(JythonScriptException.class, () -> JythonScript.compile("\n"));
+        assertThrows(JythonScriptException.class, () -> JythonScript.compile("\t"));
+        assertThrows(JythonScriptException.class, () -> JythonScript.compile("\r"));
     }
 
     @Test
-    public void testCompile_filePathValid() {
-        String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testEvaluate.py").getPath();
-
-        try {
-            PyCode compiledScript = JythonScript.compile(filePath);
-            assertNotNull(compiledScript);
-        } catch (JythonScriptException e) {
-            fail("Compiling scripts failed. error=[" + e + "]");
-        }
-    }
-
-    @Test(expected = JythonScriptException.class)
-    public void testCompile_urlNull() throws JythonScriptException {
-        JythonScript.compile((URL) null);
-    }
-
-    @Test(expected = JythonScriptException.class)
-    public void testCompile_urlInvalid() throws Exception {
-        JythonScript.compile(new URL("http://test"));
+    void testCompile_filePathInvalid() {
+        assertThrows(JythonScriptException.class, () -> JythonScript.compile("/Users/test/notfound.py"));
     }
 
     @Test
-    public void testCompile_urlValid() throws JythonScriptException {
-        URL scriptUrl = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testEvaluate.py");
+    void testCompile_filePathValid() throws JythonScriptException {
+        final String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testEvaluate.py").getPath();
 
-        try {
-            PyCode compiledScript = JythonScript.compile(scriptUrl);
-            assertNotNull(compiledScript);
-        } catch (JythonScriptException e) {
-            fail("Compiling scripts failed. error=[" + e + "]");
-        }
-    }
-
-    @Test(expected = JythonScriptException.class)
-    public void testCompile_fileNull() throws JythonScriptException {
-        JythonScript.compile((File) null);
-    }
-
-    @Test(expected = JythonScriptException.class)
-    public void testCompile_fileEmpty() throws JythonScriptException {
-        JythonScript.compile(new File("/"));
-    }
-
-    @Test(expected = JythonScriptException.class)
-    public void testCompile_fileInvalid() throws JythonScriptException {
-        JythonScript.compile(new File("/Users/test/notfound.py"));
+        assertNotNull(JythonScript.compile(filePath));
     }
 
     @Test
-    public void testCompile_fileValid() {
-        File file = new File(ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testEvaluate.py").getPath());
-
-        try {
-            PyCode compiledScript = JythonScript.compile(file);
-            assertNotNull(compiledScript);
-        } catch (JythonScriptException e) {
-            fail("Compiling scripts failed. error=[" + e + "]");
-        }
-    }
-
-    @Test(expected = JythonScriptException.class)
-    public void testCompile_directory() throws JythonScriptException {
-        File file = new File(ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH).getPath());
-
-        JythonScript.compile(file);
-    }
-
-    @Test(expected = JythonScriptException.class)
-    public void testCompileString_null() throws JythonScriptException {
-        JythonScript.compileString(null);
+    void testCompile_urlNull() {
+        assertThrows(JythonScriptException.class, () -> JythonScript.compile((URL) null));
     }
 
     @Test
-    public void testCompileString_empty() throws JythonScriptException {
-        try {
-            JythonScript.compileString("");
-        } catch (JythonScriptException e) {
-            // This is expected
-        }
-
-        try {
-            JythonScript.compileString("    ");
-        } catch (JythonScriptException e) {
-            // This is expected
-        }
-
-        try {
-            JythonScript.compileString("\n");
-        } catch (JythonScriptException e) {
-            // This is expected
-        }
-
-        try {
-            JythonScript.compileString("\t");
-        } catch (JythonScriptException e) {
-            // This is expected
-        }
-
-        try {
-            JythonScript.compileString("\r");
-        } catch (JythonScriptException e) {
-            // This is expected
-        }
+    void testCompile_urlInvalid() {
+        assertThrows(JythonScriptException.class, () -> JythonScript.compile(new URL("http://test")));
     }
 
     @Test
-    public void testCompileString_valid() {
-        String script = "from java.lang import System\n" +
+    void testCompile_urlValid() throws JythonScriptException {
+        final URL scriptUrl = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testEvaluate.py");
+
+        assertNotNull(JythonScript.compile(scriptUrl));
+    }
+
+    @Test
+    void testCompile_fileNull() {
+        assertThrows(JythonScriptException.class, () -> JythonScript.compile((File) null));
+    }
+
+    @Test
+    void testCompile_fileEmpty() {
+        assertThrows(JythonScriptException.class, () -> JythonScript.compile(new File("/")));
+    }
+
+    @Test
+    void testCompile_fileInvalid() {
+        assertThrows(JythonScriptException.class, () -> JythonScript.compile(new File("/Users/test/notfound.py")));
+    }
+
+    @Test
+    void testCompile_fileValid() throws JythonScriptException {
+        final File file = new File(ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testEvaluate.py").getPath());
+
+        assertNotNull(JythonScript.compile(file));
+    }
+
+    @Test
+    void testCompile_directory() {
+        final File file = new File(ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH).getPath());
+
+        assertThrows(JythonScriptException.class, () -> JythonScript.compile(file));
+    }
+
+    @Test
+    void testCompileString_null() {
+        assertThrows(JythonScriptException.class, () -> JythonScript.compileString(null));
+    }
+
+    @Test
+    void testCompileString_empty() {
+        assertThrows(JythonScriptException.class, () -> JythonScript.compileString(""));
+        assertThrows(JythonScriptException.class, () -> JythonScript.compileString("    "));
+        assertThrows(JythonScriptException.class, () -> JythonScript.compileString("\n"));
+        assertThrows(JythonScriptException.class, () -> JythonScript.compileString("\t"));
+        assertThrows(JythonScriptException.class, () -> JythonScript.compileString("\r"));
+    }
+
+    @Test
+    void testCompileString_valid() throws JythonScriptException {
+        final String script =
+                "from java.lang import System\n" +
                 "\n" +
                 "\n" +
                 "def test():\n" +
@@ -192,741 +134,396 @@ public class JythonScriptTest {
                 "if __name__ == '__main__':\n" +
                 "    test()";
 
-        PyCode compiledScript = null;
-        try {
-            compiledScript = JythonScript.compileString(script);
-        } catch (JythonScriptException e) {
-            fail("Compiling scripts failed. error=[" + e + "]");
-        }
-
-        assertNotNull(compiledScript);
-    }
-
-    @Test(expected = JythonScriptException.class)
-    public void testEvaluate_filePathNull() throws JythonScriptException {
-        JythonScript.evaluate((String) null);
+        assertNotNull(JythonScript.compileString(script));
     }
 
     @Test
-    public void testEvaluate_filePathEmpty() {
-        try {
-            JythonScript.evaluate("");
-        } catch (JythonScriptException e) {
-            // This is expected
-        }
-
-        try {
-            JythonScript.evaluate("    ");
-        } catch (JythonScriptException e) {
-            // This is expected
-        }
-
-        try {
-            JythonScript.evaluate("\n");
-        } catch (JythonScriptException e) {
-            // This is expected
-        }
-
-        try {
-            JythonScript.evaluate("\r");
-        } catch (JythonScriptException e) {
-            // This is expected
-        }
-
-        try {
-            JythonScript.evaluate("\t");
-        } catch (JythonScriptException e) {
-            // This is expected
-        }
+    void testEvaluate_filePathNull() {
+        assertThrows(JythonScriptException.class, () -> JythonScript.evaluate((String) null));
     }
 
-    @Test(expected = JythonScriptException.class)
-    public void testEvaluate_filePathInvalid() throws JythonScriptException {
-        JythonScript.evaluate("/Users/test/notfound.py");
+    @Test
+    void testEvaluate_filePathEmpty() {
+        assertThrows(JythonScriptException.class, () -> JythonScript.evaluate(""));
+        assertThrows(JythonScriptException.class, () -> JythonScript.evaluate("    "));
+        assertThrows(JythonScriptException.class, () -> JythonScript.evaluate("\n"));
+        assertThrows(JythonScriptException.class, () -> JythonScript.evaluate("\t"));
+        assertThrows(JythonScriptException.class, () -> JythonScript.evaluate("\r"));
+    }
+
+    @Test
+    void testEvaluate_filePathInvalid() {
+        assertThrows(JythonScriptException.class, () -> JythonScript.evaluate("/Users/test/notfound.py"));
 
     }
 
     @Test
-    public void testEvaluate_filePath() {
-        String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testEvaluate.py").getPath();
+    void testEvaluate_filePath() throws JythonScriptException {
+        final String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testEvaluate.py").getPath();
 
-        try {
-            Object result = JythonScript.evaluate(filePath);
-            assertEquals(25, result);
-
-            result = JythonScript.evaluate(filePath, 10, 10);
-            assertEquals(100, result);
-
-            result = JythonScript.evaluate(filePath, 0, 0);
-            assertEquals(0, result);
-
-            result = JythonScript.evaluate(filePath, -1, 20);
-            assertEquals(-20, result);
-        } catch (JythonScriptException e) {
-            fail("Script execution failed. error=[" + e + "]");
-        }
-    }
-
-    @Test(expected = JythonScriptException.class)
-    public void testExecute_filePathNull() throws JythonScriptException {
-        JythonScript.execute((String) null);
+        assertEquals(25, JythonScript.evaluate(filePath));
+        assertEquals(100, JythonScript.evaluate(filePath, 10, 10));
+        assertEquals(0, JythonScript.evaluate(filePath, 0, 0));
+        assertEquals(-20, JythonScript.evaluate(filePath, -1, 20));
     }
 
     @Test
-    public void testExecute_filePathEmpty() {
-        try {
-            JythonScript.execute("");
-        } catch (JythonScriptException e) {
-            // This is expected
-        }
-
-        try {
-            JythonScript.execute("    ");
-        } catch (JythonScriptException e) {
-            // This is expected
-        }
-
-        try {
-            JythonScript.execute("\n");
-        } catch (JythonScriptException e) {
-            // This is expected
-        }
-
-        try {
-            JythonScript.execute("\r");
-        } catch (JythonScriptException e) {
-            // This is expected
-        }
-
-        try {
-            JythonScript.execute("\t");
-        } catch (JythonScriptException e) {
-            // This is expected
-        }
-    }
-
-    @Test(expected = JythonScriptException.class)
-    public void testExecute_filePathInvalid() throws JythonScriptException {
-        JythonScript.execute("/Users/test/notfound.py");
+    void testExecute_filePathNull() {
+        assertThrows(JythonScriptException.class, () -> JythonScript.execute((String) null));
     }
 
     @Test
-    public void testExecute_filePathValid() {
-        String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testExecute.py").getPath();
-
-        try {
-            JythonScript.execute(filePath);
-        } catch (JythonScriptException e) {
-            fail("Script execution failed.");
-        }
-    }
-
-    @Test(expected = JythonScriptException.class)
-    public void testEvaluate_urlNull() throws JythonScriptException {
-        JythonScript.evaluate((URL) null);
-    }
-
-    @Test(expected = JythonScriptException.class)
-    public void testEvaluate_urlInvalid() throws Exception {
-        JythonScript.evaluate(new URL("http://test"));
-    }
-
-    @Test(expected = JythonScriptException.class)
-    public void testEvaluate_urlNotFound() throws Exception {
-        JythonScript.evaluate(new URL("file:///test/test"));
+    void testExecute_filePathEmpty() {
+        assertThrows(JythonScriptException.class, () -> JythonScript.execute(""));
+        assertThrows(JythonScriptException.class, () -> JythonScript.execute("    "));
+        assertThrows(JythonScriptException.class, () -> JythonScript.execute("\n"));
+        assertThrows(JythonScriptException.class, () -> JythonScript.execute("\t"));
+        assertThrows(JythonScriptException.class, () -> JythonScript.execute("\r"));
     }
 
     @Test
-    public void testEvaluate_urlValid() throws JythonScriptException {
-        URL scriptUrl = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testEvaluate.py");
-
-        try {
-            Object result = JythonScript.evaluate(scriptUrl);
-            assertEquals(25, result);
-
-            result = JythonScript.evaluate(scriptUrl, 10, 10);
-            assertEquals(100, result);
-
-            result = JythonScript.evaluate(scriptUrl, 0, 0);
-            assertEquals(0, result);
-
-            result = JythonScript.evaluate(scriptUrl, -1, 20);
-            assertEquals(-20, result);
-        } catch (JythonScriptException e) {
-            fail("Script execution failed. error=[" + e + "]");
-        }
-    }
-
-    @Test(expected = JythonScriptException.class)
-    public void testExecute_urlNull() throws JythonScriptException {
-        JythonScript.execute((URL) null);
-    }
-
-    @Test(expected = JythonScriptException.class)
-    public void testExecute_urlInvalid() throws Exception {
-        JythonScript.execute(new URL("http://test"));
-    }
-
-    @Test(expected = JythonScriptException.class)
-    public void testExecute_urlNotFound() throws Exception {
-        JythonScript.execute(new URL("file:///test/test"));
+    void testExecute_filePathInvalid() {
+        assertThrows(JythonScriptException.class, () -> JythonScript.execute("/Users/test/notfound.py"));
     }
 
     @Test
-    public void testExecute_urlValid() throws JythonScriptException {
-        URL scriptUrl = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testExecute.py");
+    void testExecute_filePathValid() throws JythonScriptException {
+        final String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testExecute.py").getPath();
 
-        try {
-            JythonScript.execute(scriptUrl);
-        } catch (JythonScriptException e) {
-            fail("Script execution failed.");
-        }
-    }
-
-    @Test(expected = JythonScriptException.class)
-    public void testEvaluate_fileNull() throws JythonScriptException {
-        JythonScript.evaluate((File) null);
+        JythonScript.execute(filePath);
     }
 
     @Test
-    public void testEvaluate_fileEmpty() {
-        try {
-            JythonScript.evaluate(new File(""));
-        } catch (JythonScriptException e) {
-            // This is expected
-        }
-
-        try {
-            JythonScript.evaluate(new File("    "));
-        } catch (JythonScriptException e) {
-            // This is expected
-        }
-
-        try {
-            JythonScript.evaluate(new File("\n"));
-        } catch (JythonScriptException e) {
-            // This is expected
-        }
-
-        try {
-            JythonScript.evaluate(new File("\r"));
-        } catch (JythonScriptException e) {
-            // This is expected
-        }
-
-        try {
-            JythonScript.evaluate(new File("\t"));
-        } catch (JythonScriptException e) {
-            // This is expected
-        }
-    }
-
-    @Test(expected = JythonScriptException.class)
-    public void testEvaluate_fileInvalid() throws JythonScriptException {
-        JythonScript.evaluate("/Users/test/notfound.py");
+    void testEvaluate_urlNull() {
+        assertThrows(JythonScriptException.class, () -> JythonScript.evaluate((URL) null));
     }
 
     @Test
-    public void testEvaluate_fileValid() {
-        String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testEvaluate.py").getPath();
-        File file = new File(filePath);
-
-        try {
-            Object result = JythonScript.evaluate(file);
-            assertEquals(25, result);
-
-            result = JythonScript.evaluate(file, 10, 10);
-            assertEquals(100, result);
-
-            result = JythonScript.evaluate(file, 0, 0);
-            assertEquals(0, result);
-
-            result = JythonScript.evaluate(file, -1, 20);
-            assertEquals(-20, result);
-        } catch (JythonScriptException e) {
-            fail("Script execution failed. error=[" + e + "]");
-        }
-    }
-
-    @Test(expected = JythonScriptException.class)
-    public void testExecute_fileNull() throws JythonScriptException {
-        JythonScript.execute((File) null);
+    void testEvaluate_urlInvalid() {
+        assertThrows(JythonScriptException.class, () -> JythonScript.evaluate(new URL("http://test")));
     }
 
     @Test
-    public void testExecute_fileEmpty() {
-        try {
-            JythonScript.execute(new File(""));
-        } catch (JythonScriptException e) {
-            // This is expected
-        }
-
-        try {
-            JythonScript.execute(new File("    "));
-        } catch (JythonScriptException e) {
-            // This is expected
-        }
-
-        try {
-            JythonScript.execute(new File("\n"));
-        } catch (JythonScriptException e) {
-            // This is expected
-        }
-
-        try {
-            JythonScript.execute(new File("\r"));
-        } catch (JythonScriptException e) {
-            // This is expected
-        }
-
-        try {
-            JythonScript.execute(new File("\t"));
-        } catch (JythonScriptException e) {
-            // This is expected
-        }
-    }
-
-    @Test(expected = JythonScriptException.class)
-    public void testExecute_fileInvalid() throws JythonScriptException {
-        JythonScript.execute(new File("/Users/test/notfound.py"));
+    void testEvaluate_urlNotFound() {
+        assertThrows(JythonScriptException.class, () -> JythonScript.evaluate(new URL("file:///test/test")));
     }
 
     @Test
-    public void testExecute_fileValid() {
-        String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testExecute.py").getPath();
+    void testEvaluate_urlValid() throws JythonScriptException {
+        final URL scriptUrl = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testEvaluate.py");
 
-        try {
-            JythonScript.execute(new File(filePath));
-        } catch (JythonScriptException e) {
-            fail("Script execution failed.");
-        }
-    }
-
-    @Test(expected = JythonScriptException.class)
-    public void testEvaluate_inputStreamNull() throws JythonScriptException {
-        JythonScript.evaluate((InputStream) null);
+        assertEquals(25, JythonScript.evaluate(scriptUrl));
+        assertEquals(100, JythonScript.evaluate(scriptUrl, 10, 10));
+        assertEquals(0, JythonScript.evaluate(scriptUrl, 0, 0));
+        assertEquals(-20, JythonScript.evaluate(scriptUrl, -1, 20));
     }
 
     @Test
-    public void testEvaluate_inputStreamEmpty() {
-        try {
-            JythonScript.evaluate(new FileInputStream(new File("")));
-        } catch (Exception e) {
-            // This is expected
-        }
-
-        try {
-            JythonScript.evaluate(new FileInputStream(new File("    ")));
-        } catch (Exception e) {
-            // This is expected
-        }
-
-        try {
-            JythonScript.evaluate(new FileInputStream(new File("\n")));
-        } catch (Exception e) {
-            // This is expected
-        }
-
-        try {
-            JythonScript.evaluate(new FileInputStream(new File("\t")));
-        } catch (Exception e) {
-            // This is expected
-        }
-
-        try {
-            JythonScript.evaluate(new FileInputStream(new File("\r")));
-        } catch (Exception e) {
-            // This is expected
-        }
-    }
-
-    @Test(expected = Exception.class)
-    public void testEvaluate_inputStreamInvalid() throws Exception {
-        JythonScript.execute(new FileInputStream(new File("/Users/test/notfound.py")));
+    void testExecute_urlNull() {
+        assertThrows(JythonScriptException.class, () -> JythonScript.execute((URL) null));
     }
 
     @Test
-    public void testEvaluate_inputStream() {
-        String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testEvaluate.py").getPath();
-        File file = new File(filePath);
-
-        try {
-            Object result = JythonScript.evaluate(new FileInputStream(file));
-            assertEquals(25, result);
-
-            result = JythonScript.evaluate(new FileInputStream(file), 10, 10);
-            assertEquals(100, result);
-
-            result = JythonScript.evaluate(new FileInputStream(file), 0, 0);
-            assertEquals(0, result);
-
-            result = JythonScript.evaluate(new FileInputStream(file), -1, 20);
-            assertEquals(-20, result);
-        } catch (Exception e) {
-            fail("Script execution failed. error=[" + e + "]");
-        }
-    }
-
-    @Test(expected = JythonScriptException.class)
-    public void testExecute_inputStreamNull() throws JythonScriptException {
-        JythonScript.execute((InputStream) null);
+    void testExecute_urlInvalid() {
+        assertThrows(JythonScriptException.class, () -> JythonScript.execute(new URL("http://test")));
     }
 
     @Test
-    public void testExecute_inputStreamEmpty() {
-        try {
-            JythonScript.execute(new FileInputStream(new File("")));
-        } catch (Exception e) {
-            // This is expected
-        }
-
-        try {
-            JythonScript.execute(new FileInputStream(new File("    ")));
-        } catch (Exception e) {
-            // This is expected
-        }
-
-        try {
-            JythonScript.execute(new FileInputStream(new File("\n")));
-        } catch (Exception e) {
-            // This is expected
-        }
-
-        try {
-            JythonScript.execute(new FileInputStream(new File("\r")));
-        } catch (Exception e) {
-            // This is expected
-        }
-
-        try {
-            JythonScript.execute(new FileInputStream(new File("\t")));
-        } catch (Exception e) {
-            // This is expected
-        }
-    }
-
-    @Test(expected = Exception.class)
-    public void testExecute_inputStreamInvalid() throws Exception {
-        JythonScript.execute(new FileInputStream(new File("/Users/test/notfound.py")));
+    void testExecute_urlNotFound() {
+        assertThrows(JythonScriptException.class, () -> JythonScript.execute(new URL("file:///test/test")));
     }
 
     @Test
-    public void testExecute_inputStreamValid() {
-        String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testExecute.py").getPath();
+    void testExecute_urlValid() throws JythonScriptException {
+        final URL scriptUrl = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testExecute.py");
 
-        try {
-            JythonScript.execute(new FileInputStream(new File(filePath)));
-        } catch (Exception e) {
-            fail("Script execution failed.");
-        }
-    }
-
-    @Test(expected = JythonScriptException.class)
-    public void testEvaluate_pycodeNull() throws JythonScriptException {
-        JythonScript.evaluate((PyCode) null);
-    }
-
-    @Test(expected = JythonScriptException.class)
-    public void testEvaluate_pycodeEmpty() throws JythonScriptException {
-        JythonScript.evaluate(new TestPyCode());
+        JythonScript.execute(scriptUrl);
     }
 
     @Test
-    public void testEvaluate_pycodeNoResult() {
-        try {
-            String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testResultNotFound.py").getPath();
-            PyCode compiledScript = JythonScript.compile(filePath);
+    void testEvaluate_fileNull() {
+        assertThrows(JythonScriptException.class, () -> JythonScript.evaluate((File) null));
+    }
+
+    @Test
+    void testEvaluate_fileEmpty() {
+        assertThrows(JythonScriptException.class, () -> JythonScript.evaluate(new File("")));
+        assertThrows(JythonScriptException.class, () -> JythonScript.evaluate(new File("    ")));
+        assertThrows(JythonScriptException.class, () -> JythonScript.evaluate(new File("\n")));
+        assertThrows(JythonScriptException.class, () -> JythonScript.evaluate(new File("\t")));
+        assertThrows(JythonScriptException.class, () -> JythonScript.evaluate(new File("\r")));
+    }
+
+    @Test
+    void testEvaluate_fileInvalid() {
+        assertThrows(JythonScriptException.class, () -> JythonScript.evaluate("/Users/test/notfound.py"));
+    }
+
+    @Test
+    void testEvaluate_fileValid() throws JythonScriptException {
+        final String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testEvaluate.py").getPath();
+        final File file = new File(filePath);
+
+        assertEquals(25, JythonScript.evaluate(file));
+        assertEquals(100, JythonScript.evaluate(file, 10, 10));
+        assertEquals(0, JythonScript.evaluate(file, 0, 0));
+        assertEquals(-20, JythonScript.evaluate(file, -1, 20));
+    }
+
+    @Test
+    void testExecute_fileNull() {
+        assertThrows(JythonScriptException.class, () -> JythonScript.execute((File) null));
+    }
+
+    @Test
+    void testExecute_fileEmpty() {
+        assertThrows(JythonScriptException.class, () -> JythonScript.execute(new File("")));
+        assertThrows(JythonScriptException.class, () -> JythonScript.execute(new File("    ")));
+        assertThrows(JythonScriptException.class, () -> JythonScript.execute(new File("\n")));
+        assertThrows(JythonScriptException.class, () -> JythonScript.execute(new File("\t")));
+        assertThrows(JythonScriptException.class, () -> JythonScript.execute(new File("\r")));
+    }
+
+    @Test
+    void testExecute_fileInvalid() {
+        assertThrows(JythonScriptException.class, () -> JythonScript.execute(new File("/Users/test/notfound.py")));
+    }
+
+    @Test
+    void testExecute_fileValid() throws JythonScriptException {
+        final String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testExecute.py").getPath();
+
+        JythonScript.execute(new File(filePath));
+    }
+
+    @Test
+    void testEvaluate_inputStreamNull() {
+        assertThrows(JythonScriptException.class, () -> JythonScript.evaluate((InputStream) null));
+    }
+
+    @Test
+    void testEvaluate_inputStreamEmpty() {
+        assertThrows(FileNotFoundException.class, () -> JythonScript.evaluate(new FileInputStream(new File(""))));
+        assertThrows(FileNotFoundException.class, () -> JythonScript.evaluate(new FileInputStream(new File("    "))));
+        assertThrows(FileNotFoundException.class, () -> JythonScript.evaluate(new FileInputStream(new File("\n"))));
+        assertThrows(FileNotFoundException.class, () -> JythonScript.evaluate(new FileInputStream(new File("\t"))));
+        assertThrows(FileNotFoundException.class, () -> JythonScript.evaluate(new FileInputStream(new File("\r"))));
+    }
+
+    @Test
+    void testEvaluate_inputStreamInvalid() {
+        assertThrows(FileNotFoundException.class, () ->
+                JythonScript.execute(new FileInputStream(new File("/Users/test/notfound.py"))));
+    }
+
+    @Test
+    void testEvaluate_inputStream() throws Exception {
+        final String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testEvaluate.py").getPath();
+        final File file = new File(filePath);
+
+        assertEquals(25, JythonScript.evaluate(new FileInputStream(file)));
+        assertEquals(100, JythonScript.evaluate(new FileInputStream(file), 10, 10));
+        assertEquals(0, JythonScript.evaluate(new FileInputStream(file), 0, 0));
+        assertEquals(-20, JythonScript.evaluate(new FileInputStream(file), -1, 20));
+    }
+
+    @Test
+    void testExecute_inputStreamNull() {
+        assertThrows(JythonScriptException.class, () -> JythonScript.execute((InputStream) null));
+    }
+
+    @Test
+    void testExecute_inputStreamEmpty() {
+        assertThrows(FileNotFoundException.class, () -> JythonScript.execute(new FileInputStream(new File(""))));
+        assertThrows(FileNotFoundException.class, () -> JythonScript.execute(new FileInputStream(new File("    "))));
+        assertThrows(FileNotFoundException.class, () -> JythonScript.execute(new FileInputStream(new File("\n"))));
+        assertThrows(FileNotFoundException.class, () -> JythonScript.execute(new FileInputStream(new File("\t"))));
+        assertThrows(FileNotFoundException.class, () -> JythonScript.execute(new FileInputStream(new File("\r"))));
+    }
+
+    @Test
+    void testExecute_inputStreamInvalid() {
+        assertThrows(FileNotFoundException.class, () ->
+                JythonScript.execute(new FileInputStream(new File("/Users/test/notfound.py"))));
+    }
+
+    @Test
+    void testExecute_inputStreamValid() throws Exception {
+        final String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testExecute.py").getPath();
+
+        JythonScript.execute(new FileInputStream(new File(filePath)));
+    }
+
+    @Test
+    void testEvaluate_pycodeNull() {
+        assertThrows(JythonScriptException.class, () -> JythonScript.evaluate((PyCode) null));
+    }
+
+    @Test
+    void testEvaluate_pycodeEmpty() {
+        assertThrows(JythonScriptException.class, () -> JythonScript.evaluate(new TestPyCode()));
+    }
+
+    @Test
+    void testEvaluate_pycodeNoResult() {
+        final String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testResultNotFound.py").getPath();
+
+        assertThrows(JythonResultNotFoundException.class, () -> {
+            final PyCode compiledScript = JythonScript.compile(filePath);
 
             JythonScript.evaluate(compiledScript);
-        } catch (Exception e) {
-            // This is expected
-            assertTrue(e instanceof JythonResultNotFoundException);
-        }
+        });
     }
 
     @Test
-    public void testEvaluate_pycodeValid() {
-        String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testEvaluate.py").getPath();
+    void testEvaluate_pycodeValid() throws JythonScriptException {
+        final String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testEvaluate.py").getPath();
+        final PyCode compiledScript = JythonScript.compile(filePath);
 
-        try {
-            PyCode compiledScript = JythonScript.compile(filePath);
-
-            Object result = JythonScript.evaluate(compiledScript);
-            assertEquals(25, result);
-
-            result = JythonScript.evaluate(compiledScript, 10, 10);
-            assertEquals(100, result);
-
-            result = JythonScript.evaluate(compiledScript, 0, 0);
-            assertEquals(0, result);
-
-            result = JythonScript.evaluate(compiledScript, -1, 20);
-            assertEquals(-20, result);
-        } catch (Exception e) {
-            fail("Script execution failed.");
-        }
-    }
-
-    @Test(expected = JythonScriptException.class)
-    public void testExecute_pycodeNull() throws JythonScriptException {
-        JythonScript.execute((PyCode) null);
-    }
-
-    @Test(expected = JythonScriptException.class)
-    public void testExecute_pycodeEmpty() throws JythonScriptException {
-        JythonScript.execute(new TestPyCode());
+        assertEquals(25, JythonScript.evaluate(compiledScript));
+        assertEquals(100, JythonScript.evaluate(compiledScript, 10, 10));
+        assertEquals(0, JythonScript.evaluate(compiledScript, 0, 0));
+        assertEquals(-20, JythonScript.evaluate(compiledScript, -1, 20));
     }
 
     @Test
-    public void testExecute_pycodeValid() {
-        String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testEvaluate.py").getPath();
-
-        try {
-            PyCode compiledScript = JythonScript.compile(filePath);
-
-            JythonScript.execute(compiledScript);
-        } catch (Exception e) {
-            fail("Script execution failed.");
-        }
+    void testExecute_pycodeNull() {
+        assertThrows(JythonScriptException.class, () -> JythonScript.execute((PyCode) null));
     }
 
     @Test
-    public void testExecute_oop() {
-        String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testOOP.py").getPath();
-        try {
-            PyCode compiledScript = JythonScript.compile(filePath);
-
-            JythonScript.execute(compiledScript, 10, 10);
-        } catch (JythonScriptException e) {
-            fail("Unexpected error occurred.");
-        }
+    void testExecute_pycodeEmpty() {
+        assertThrows(JythonScriptException.class, () -> JythonScript.execute(new TestPyCode()));
     }
 
     @Test
-    public void testEvaluate_oop() {
-        String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testOOP.py").getPath();
-        try {
-            PyCode compiledScript = JythonScript.compile(filePath);
+    void testExecute_pycodeValid() throws JythonScriptException {
+        final String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testEvaluate.py").getPath();
+        final PyCode compiledScript = JythonScript.compile(filePath);
 
-            Object result = JythonScript.evaluate(compiledScript, 10, 10);
-
-            assertNotNull(result);
-            assertEquals(51, result);
-        } catch (JythonScriptException e) {
-            fail("Unexpected error occurred.");
-        }
+        JythonScript.execute(compiledScript);
     }
 
     @Test
-    public void testEvaluate_returnBoolean() {
-        String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testReturnBoolean.py").getPath();
-        try {
-            PyCode compiledScript = JythonScript.compile(filePath);
+    void testExecute_oop() throws JythonScriptException {
+        final String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testOOP.py").getPath();
+        final PyCode compiledScript = JythonScript.compile(filePath);
 
-            Object result = JythonScript.evaluate(compiledScript);
-            assertNotNull(result);
-            assertTrue(result instanceof Boolean);
-            assertEquals(false, result);
-
-            result = JythonScript.evaluate(compiledScript, false, false);
-            assertNotNull(result);
-            assertTrue(result instanceof Boolean);
-            assertEquals(false, result);
-
-            result = JythonScript.evaluate(compiledScript, true, false);
-            assertNotNull(result);
-            assertTrue(result instanceof Boolean);
-            assertEquals(true, result);
-
-            result = JythonScript.evaluate(compiledScript, false, true);
-            assertNotNull(result);
-            assertTrue(result instanceof Boolean);
-            assertEquals(true, result);
-
-            result = JythonScript.evaluate(compiledScript, true, true);
-            assertNotNull(result);
-            assertTrue(result instanceof Boolean);
-            assertEquals(true, result);
-        } catch (JythonScriptException e) {
-            fail("Unexpected error occurred.");
-        }
+        JythonScript.execute(compiledScript, 10, 10);
     }
 
     @Test
-    public void testEvaluate_returnInteger() {
-        String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testEvaluate.py").getPath();
-        try {
-            PyCode compiledScript = JythonScript.compile(filePath);
+    void testEvaluate_oop() throws JythonScriptException {
+        final String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testOOP.py").getPath();
+        final PyCode compiledScript = JythonScript.compile(filePath);
 
-            Object result = JythonScript.evaluate(compiledScript);
-            assertNotNull(result);
-            assertTrue(result instanceof Integer);
-            assertEquals(25, result);
-
-            result = JythonScript.evaluate(compiledScript, 10, 10);
-            assertNotNull(result);
-            assertTrue(result instanceof Integer);
-            assertEquals(100, result);
-
-            result = JythonScript.evaluate(compiledScript, 0, 0);
-            assertNotNull(result);
-            assertTrue(result instanceof Integer);
-            assertEquals(0, result);
-
-            result = JythonScript.evaluate(compiledScript, -1, 20);
-            assertNotNull(result);
-            assertTrue(result instanceof Integer);
-            assertEquals(-20, result);
-        } catch (JythonScriptException e) {
-            fail("Unexpected error occurred.");
-        }
+        assertEquals(51, JythonScript.evaluate(compiledScript, 10, 10));
     }
 
     @Test
-    public void testEvaluate_returnString() {
-        String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testReturnString.py").getPath();
-        try {
-            PyCode compiledScript = JythonScript.compile(filePath);
+    void testEvaluate_returnBoolean() throws JythonScriptException {
+        final String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testReturnBoolean.py").getPath();
+        final PyCode compiledScript = JythonScript.compile(filePath);
 
-            Object result = JythonScript.evaluate(compiledScript);
-            assertNotNull(result);
-            assertTrue(result instanceof String);
-            assertEquals("", result);
-
-            result = JythonScript.evaluate(compiledScript, "jython", "test");
-            assertNotNull(result);
-            assertTrue(result instanceof String);
-            assertEquals("jython", result);
-
-            result = JythonScript.evaluate(compiledScript, "test", "jython");
-            assertNotNull(result);
-            assertTrue(result instanceof String);
-            assertEquals("jython", result);
-
-            result = JythonScript.evaluate(compiledScript, "test");
-            assertNotNull(result);
-            assertTrue(result instanceof String);
-            assertEquals("test", result);
-        } catch (JythonScriptException e) {
-            fail("Unexpected error occurred.");
-        }
+        assertEquals(false, JythonScript.evaluate(compiledScript));
+        assertEquals(false, JythonScript.evaluate(compiledScript, false, false));
+        assertEquals(true, JythonScript.evaluate(compiledScript, true, false));
+        assertEquals(true, JythonScript.evaluate(compiledScript, false, true));
+        assertEquals(true, JythonScript.evaluate(compiledScript, true, true));
     }
 
     @Test
-    public void testEvaluate_returnFloat() {
-        String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testReturnFloat.py").getPath();
-        try {
-            PyCode compiledScript = JythonScript.compile(filePath);
+    void testEvaluate_returnInteger() throws JythonScriptException {
+        final String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testEvaluate.py").getPath();
+        final PyCode compiledScript = JythonScript.compile(filePath);
 
-            Object result = JythonScript.evaluate(compiledScript);
-            assertNotNull(result);
-            assertTrue(result instanceof Float);
-            assertEquals(8.778f, result);
-
-            result = JythonScript.evaluate(compiledScript, 10.5, 10.1);
-            assertNotNull(result);
-            assertTrue(result instanceof Float);
-            assertEquals(20.6f, result);
-
-            result = JythonScript.evaluate(compiledScript, 0.0, 0);
-            assertNotNull(result);
-            assertTrue(result instanceof Float);
-            assertEquals(0f, result);
-
-            result = JythonScript.evaluate(compiledScript, -1.5, 20.736587);
-            assertNotNull(result);
-            assertTrue(result instanceof Float);
-            assertEquals(19.236588f, result);
-        } catch (JythonScriptException e) {
-            fail("Unexpected error occurred.");
-        }
+        assertEquals(25, JythonScript.evaluate(compiledScript));
+        assertEquals(100, JythonScript.evaluate(compiledScript, 10, 10));
+        assertEquals(0, JythonScript.evaluate(compiledScript, 0, 0));
+        assertEquals(-20, JythonScript.evaluate(compiledScript, -1, 20));
     }
 
     @Test
-    public void testEvaluate_returnLong() {
-        String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testEvaluate.py").getPath();
-        try {
-            PyCode compiledScript = JythonScript.compile(filePath);
+    void testEvaluate_returnString() throws JythonScriptException {
+        final String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testReturnString.py").getPath();
+        final PyCode compiledScript = JythonScript.compile(filePath);
 
-            Object result = JythonScript.evaluate(compiledScript, 75987958723958L, 3);
-            assertNotNull(result);
-            assertTrue(result instanceof Long);
-            assertEquals(227963876171874L, result);
-        } catch (JythonScriptException e) {
-            fail("Unexpected error occurred.");
-        }
+        assertEquals("", JythonScript.evaluate(compiledScript));
+        assertEquals("jython", JythonScript.evaluate(compiledScript, "jython", "test"));
+        assertEquals("jython", JythonScript.evaluate(compiledScript, "test", "jython"));
+        assertEquals("test", JythonScript.evaluate(compiledScript, "test"));
     }
 
     @Test
-    public void testEvaluate_returnList() {
-        String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testReturnList.py").getPath();
-        try {
-            PyCode compiledScript = JythonScript.compile(filePath);
+    void testEvaluate_returnFloat() throws JythonScriptException {
+        final String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testReturnFloat.py").getPath();
+        final PyCode compiledScript = JythonScript.compile(filePath);
 
-            Object[] result = (Object[]) JythonScript.evaluate(compiledScript);
-            assertNotNull(result);
-            assertEquals(12, result.length);
-            assertArrayEquals(new Object[] { "a", "b", "c", 1, 2, 3, "do", "re", "mi", 1.0f, 2.0f, 3.0f }, result);
-        } catch (JythonScriptException e) {
-            fail("Unexpected error occurred.");
-        }
+        assertEquals(20.6f, (Float) JythonScript.evaluate(compiledScript, 10.5, 10.1), DELTA);
+        assertEquals(0f, (Float) JythonScript.evaluate(compiledScript, 0.0, 0), DELTA);
+        assertEquals(19.236588f, (Float) JythonScript.evaluate(compiledScript, -1.5, 20.736587), DELTA);
+    }
+
+    @Test
+    void testEvaluate_returnLong() throws JythonScriptException {
+        final String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testEvaluate.py").getPath();
+        final PyCode compiledScript = JythonScript.compile(filePath);
+
+        assertEquals(227963876171874L, JythonScript.evaluate(compiledScript, 75987958723958L, 3));
+    }
+
+    @Test
+    void testEvaluate_returnList() throws JythonScriptException {
+        final String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testReturnList.py").getPath();
+        final PyCode compiledScript = JythonScript.compile(filePath);
+
+        assertArrayEquals(new Object[] { "a", "b", "c", 1, 2, 3, "do", "re", "mi", 1.0f, 2.0f, 3.0f },
+                (Object[]) JythonScript.evaluate(compiledScript));
     }
 
     @Test
     @SuppressWarnings("unchecked")
-    public void testEvaluate_returnDict() {
-        String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testReturnDict.py").getPath();
-        try {
-            PyCode compiledScript = JythonScript.compile(filePath);
+    void testEvaluate_returnDict() throws JythonScriptException {
+        final String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testReturnDict.py").getPath();
+        final PyCode compiledScript = JythonScript.compile(filePath);
+        final Map<Object, Object> result = (Map<Object, Object>) JythonScript.evaluate(compiledScript);
 
-            Map<Object, Object> result = (Map<Object, Object>) JythonScript.evaluate(compiledScript);
-            assertNotNull(result);
-            assertEquals(3, result.size());
-            assertTrue(result.get("a").equals(1));
-            assertTrue(result.get("b").equals(2));
-            assertTrue(result.get("c").equals(3));
-        } catch (JythonScriptException e) {
-            fail("Unexpected error occurred.");
-        }
+        assertNotNull(result);
+        assertEquals(3, result.size());
+        assertEquals(1, result.get("a"));
+        assertEquals(2, result.get("b"));
+        assertEquals(3, result.get("c"));
     }
 
     @Test
     @SuppressWarnings("unchecked")
-    public void testEvaluate_returnSet() {
-        String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testReturnSet.py").getPath();
-        try {
-            PyCode compiledScript = JythonScript.compile(filePath);
+    void testEvaluate_returnSet() throws JythonScriptException {
+        final String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testReturnSet.py").getPath();
+        final PyCode compiledScript = JythonScript.compile(filePath);
+        final Set<Object> result = (Set<Object>) JythonScript.evaluate(compiledScript);
 
-            Set<Object> result = (Set<Object>) JythonScript.evaluate(compiledScript);
-            assertNotNull(result);
-            assertEquals(9, result.size());
+        assertNotNull(result);
+        assertEquals(9, result.size());
 
-            Object[] expected = new Object[] { "a", "b", "c", 1, 2, 3, "do", "re", "mi" };
-            for (Object object : expected) {
-                assertTrue(result.contains(object));
-            }
-        } catch (JythonScriptException e) {
-            fail("Unexpected error occurred.");
+        final Object[] expected = new Object[] { "a", "b", "c", 1, 2, 3, "do", "re", "mi" };
+        for (final Object object : expected) {
+            assertTrue(result.contains(object));
         }
     }
 
     @Test
-    public void testEvaluate_unsupportedReturnType() {
-        // Valid
-        try {
-            String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testReturnUnsupportedType.py").getPath();
-            Object result = JythonScript.evaluate(filePath);
+    void testEvaluate_unsupportedReturnType() throws JythonScriptException {
+        final String filePath = ClassLoader.getSystemResource(JYTHON_SCRIPT_BASE_PATH + "testReturnUnsupportedType.py").getPath();
+        final Object result = JythonScript.evaluate(filePath);
 
-            assertNotNull(result);
-            assertTrue(result instanceof PyObject);
-        } catch (JythonScriptException e) {
-            fail("Script execution failed. error=[" + e + "]");
-        }
+        assertNotNull(result);
+        assertTrue(result instanceof PyInstance);
     }
 
     @Test
-    public void testConstructorIsPrivate() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-        Constructor<JythonScript> constructor = JythonScript.class.getDeclaredConstructor();
+    void testConstructorIsPrivate() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        final Constructor<JythonScript> constructor = JythonScript.class.getDeclaredConstructor();
+
         assertTrue(Modifier.isPrivate(constructor.getModifiers()));
         constructor.setAccessible(true);
         constructor.newInstance();

@@ -6,7 +6,7 @@ package com.github.adchilds.util;
  * @author Adam Childs
  * @since 1.0
  */
-public class StringUtil {
+public final class StringUtils {
 
     /**
      * Determines if the given {@link String} is null or empty.
@@ -31,6 +31,6 @@ public class StringUtil {
     }
 
     // Don't allow this class to be instantiated
-    private StringUtil() { }
+    private StringUtils() { }
 
 }

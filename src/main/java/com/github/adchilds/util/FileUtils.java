@@ -8,7 +8,7 @@ import java.io.*;
  * @author Adam Childs
  * @since 1.0
  */
-public class FileUtil {
+public final class FileUtils {
 
     /**
      * Attempts to convert the given {@code object} to an {@link InputStream}. If the object cannot be converted, throws
@@ -25,7 +25,7 @@ public class FileUtil {
      * @throws IOException when the given Object cannot be converted to a FileInputStream
      * @since 1.0
      */
-    public static InputStream getFileInputStream(Object object) throws IOException {
+    public static <T> InputStream getFileInputStream(T object) throws IOException {
         if (object instanceof String) {
             return new FileInputStream((String) object);
         } else if (object instanceof File) {
@@ -73,8 +73,8 @@ public class FileUtil {
      * @since 1.0
      */
     private static byte[] readFully(InputStream inputStream) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final byte[] buffer = new byte[1024];
         int length;
 
         while ((length = inputStream.read(buffer)) != -1) {
@@ -85,6 +85,6 @@ public class FileUtil {
     }
 
     // Don't allow this class to be instantiated
-    private FileUtil() { }
+    private FileUtils() { }
 
 }
