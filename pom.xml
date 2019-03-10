@@ -65,6 +65,12 @@
                 </configuration>
             </plugin>
 
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.1</version>
+            </plugin>
+
             <!-- Sources -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -189,6 +195,12 @@
         <dependency>
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-launcher</artifactId>
+            <version>${junit.launcher.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-console</artifactId>
             <version>${junit.launcher.version}</version>
             <scope>test</scope>
         </dependency>
