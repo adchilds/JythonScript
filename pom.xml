@@ -48,9 +48,9 @@
     </distributionManagement>
 
     <properties>
-        <jython.standalone.version>2.7.1</jython.standalone.version>
-        <junit.version>5.4.0</junit.version>
-        <junit.launcher.version>1.4.0</junit.launcher.version>
+        <jython.standalone.version>2.7.2</jython.standalone.version>
+        <junit.version>5.6.1</junit.version>
+        <junit.launcher.version>1.6.1</junit.launcher.version>
     </properties>
 
     <build>
@@ -58,7 +58,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.3</version>
+                <version>3.8.1</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
@@ -68,14 +68,14 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.1</version>
+                <version>2.22.2</version>
             </plugin>
 
             <!-- Sources -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>3.2.1</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -90,7 +90,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.3</version>
+                <version>3.2.0</version>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
@@ -117,7 +117,7 @@
             <plugin>
                 <groupId>org.eluder.coveralls</groupId>
                 <artifactId>coveralls-maven-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>4.3.0</version>
                 <configuration>
                     <repoToken>${env.coveralls_repo_token}</repoToken>
                     <sourceEncoding>UTF-8</sourceEncoding>
