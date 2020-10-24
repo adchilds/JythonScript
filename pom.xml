@@ -48,7 +48,7 @@
     </distributionManagement>
 
     <properties>
-        <jython.standalone.version>2.7.1</jython.standalone.version>
+        <jython.standalone.version>2.7.2</jython.standalone.version>
         <junit.version>5.4.0</junit.version>
         <junit.launcher.version>1.4.0</junit.launcher.version>
     </properties>

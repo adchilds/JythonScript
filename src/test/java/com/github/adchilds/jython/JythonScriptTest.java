@@ -118,6 +118,11 @@ public class JythonScriptTest {
     }
 
     @Test
+    void testCompile_invalidPythonCode() {
+        assertThrows(JythonScriptException.class, () -> JythonScript.compileString("Invalid Python code..."));
+    }
+
+    @Test
     void testCompileString_valid() throws JythonScriptException {
         final String script =
                 "from java.lang import System\n" +

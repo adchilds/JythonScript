@@ -146,12 +146,15 @@ public class JythonScript {
         }
 
         // Compile the file, returning the associated PyCode object
+        final String script;
         try {
-            return compileString(FileUtils.readFully(file));
+            script = FileUtils.readFully(file);
         } catch (IOException e) {
-            throw new JythonScriptException("Could not compile the given file. file=[" +
-                    file.getAbsolutePath() + "]", e);
+            throw new JythonScriptException("Could not read the contents of the given file. file=[" +
+                    file.getAbsolutePath() + "]");
         }
+
+        return compileString(script);
     }
 
     /**
@@ -170,7 +173,11 @@ public class JythonScript {
         final PythonInterpreter interpreter = new PythonInterpreter();
 
         // Compile the script, returning the associated PyCode object
-        return interpreter.compile(script);
+        try {
+            return interpreter.compile(script);
+        } catch (Exception e) {
+            throw new JythonScriptException("Could not compile the given script.", e);
+        }
     }
 
     /**
@@ -628,9 +635,9 @@ public class JythonScript {
     private static Map<Object, Object> parsePyObjectDict(final Map<PyObject, PyObject> pyDict) {
         final Map<Object, Object> objects = new HashMap<>();
 
-        for (final Map.Entry entry : pyDict.entrySet()) {
-            final Object key = parseResult((PyObject) entry.getKey());
-            final Object value = parseResult((PyObject) entry.getValue());
+        for (final Map.Entry<PyObject, PyObject> entry : pyDict.entrySet()) {
+            final Object key = parseResult(entry.getKey());
+            final Object value = parseResult(entry.getValue());
 
             objects.put(key, value);
         }
