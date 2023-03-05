@@ -1,6 +1,7 @@
 package com.github.adchilds.jython.exception;
 
 import com.github.adchilds.jython.JythonScript;
+import com.github.adchilds.jython.serialization.DefaultPyObjectSerializationFactory;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -13,11 +14,15 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class JythonScriptExceptionTest {
 
+    private final JythonScript jythonScript = new JythonScript.Builder()
+            .serializationFactory(new DefaultPyObjectSerializationFactory())
+            .build();
+
     private final String EXCEPTION_MESSAGE = "An exception was thrown.";
 
     @Test
     void testJythonScriptException_invalidFile() {
-        assertThrows(JythonScriptException.class, () -> JythonScript.compile(""));
+        assertThrows(JythonScriptException.class, () -> jythonScript.compile(""));
     }
 
     @Test

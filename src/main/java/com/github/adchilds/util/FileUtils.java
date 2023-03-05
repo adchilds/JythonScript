@@ -1,6 +1,8 @@
 package com.github.adchilds.util;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
  * Provides static file operations, such as converting a {@link String} or {@link File} to an {@link InputStream}.
@@ -13,6 +15,8 @@ public final class FileUtils {
     /**
      * Attempts to convert the given {@code object} to an {@link InputStream}. If the object cannot be converted, throws
      * an {@link Exception}.
+     *
+     * <br />
      *
      * Current supported object conversions include:
      * <ul>
@@ -29,7 +33,7 @@ public final class FileUtils {
         if (object instanceof String) {
             return new FileInputStream((String) object);
         } else if (object instanceof File) {
-            return new FileInputStream((File) object);
+            return Files.newInputStream(((File) object).toPath());
         }
 
         throw new IOException("Could not convert the given object to an InputStream. object=[" + object + "]");
@@ -48,7 +52,7 @@ public final class FileUtils {
             return "";
         }
 
-        return readFully(new FileInputStream(file), "UTF-8");
+        return readFully(Files.newInputStream(file.toPath()), "UTF-8");
     }
 
     /**

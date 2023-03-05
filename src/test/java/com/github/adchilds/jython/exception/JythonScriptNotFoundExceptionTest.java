@@ -1,6 +1,7 @@
 package com.github.adchilds.jython.exception;
 
 import com.github.adchilds.jython.JythonScript;
+import com.github.adchilds.jython.serialization.DefaultPyObjectSerializationFactory;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -13,11 +14,15 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class JythonScriptNotFoundExceptionTest {
 
+    private final JythonScript jythonScript = new JythonScript.Builder()
+            .serializationFactory(new DefaultPyObjectSerializationFactory())
+            .build();
+
     private final String EXCEPTION_MESSAGE = "An exception was thrown.";
 
     @Test
     void testJythonScriptNotFoundException_invalidFile() {
-        assertThrows(JythonScriptNotFoundException.class, () -> JythonScript.evaluate("invalidFile.py"));
+        assertThrows(JythonScriptNotFoundException.class, () -> jythonScript.evaluate("invalidFile.py"));
     }
 
     @Test

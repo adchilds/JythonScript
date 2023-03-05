@@ -2,6 +2,7 @@ package com.github.adchilds.jython.exception;
 
 import com.github.adchilds.jython.JythonScript;
 import com.github.adchilds.jython.JythonScriptTest;
+import com.github.adchilds.jython.serialization.DefaultPyObjectSerializationFactory;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -14,6 +15,10 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class JythonResultNotFoundExceptionTest {
 
+    private final JythonScript jythonScript = new JythonScript.Builder()
+            .serializationFactory(new DefaultPyObjectSerializationFactory())
+            .build();
+
     private final String EXCEPTION_MESSAGE = "An exception was thrown.";
 
     @Test
@@ -21,7 +26,7 @@ class JythonResultNotFoundExceptionTest {
         final String filePath =
                 ClassLoader.getSystemResource(JythonScriptTest.JYTHON_SCRIPT_BASE_PATH + "testResultNotFound.py").getPath();
 
-        assertThrows(JythonResultNotFoundException.class, () -> JythonScript.evaluate(filePath));
+        assertThrows(JythonResultNotFoundException.class, () -> jythonScript.evaluate(filePath));
     }
 
     @Test
@@ -29,7 +34,7 @@ class JythonResultNotFoundExceptionTest {
         final String filePath =
                 ClassLoader.getSystemResource(JythonScriptTest.JYTHON_SCRIPT_BASE_PATH + "testResultNotFound.py").getPath();
 
-        assertThrows(JythonResultNotFoundException.class, () -> JythonScript.evaluate(filePath, 0, 1, 2, 3, 4, 5));
+        assertThrows(JythonResultNotFoundException.class, () -> jythonScript.evaluate(filePath, 0, 1, 2, 3, 4, 5));
     }
 
     @Test
